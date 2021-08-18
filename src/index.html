@@ -1,0 +1,45 @@
+<html>
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Exo+2" rel="stylesheet">
+  <style type="text/css">
+  * {
+    margin: 0;
+    padding: 0;
+  }
+  #title {
+    font-family: 'Exo 2';
+    font-size: 16px;
+    color: #777;
+    visibility: visible;
+    margin: 0px 10px 10px 10px;
+    text-align: left;
+    display: block;
+  }
+  #title a {
+    color: #aaa;
+  }
+
+  #game {
+    display: block;
+  }
+  </style>
+
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <script type="text/javascript" src="./js/vendor/phaser.js"></script>
+  <script type="text/javascript" src="./js/game/domain/GameGrid.js"></script>
+  <script type="text/javascript" src="./js/game/domain/GamePiece.js"></script>
+  <script type="text/javascript" src="./js/game/domain/GameState.js"></script>
+  <script type="text/javascript" src="./js/game/domain/Player.js"></script>
+  <script type="text/javascript" src="./js/game/scene/BootScene.js"></script>
+  <script type="text/javascript" src="./js/game/scene/GameScene.js"></script>
+  <script type="text/javascript" src="./js/game/scene/SplashScene.js"></script>
+  <script type="text/javascript" src="./js/game/scene/TitleScene.js"></script>
+  <script type="text/javascript" src="./js/game/Game.js"></script>
+</head>
+<body>
+  <p id="title"> Zap by <a target="_blank" href="http://thekratzers.com">Bill Kratzer</a> | <a href="https://github.com/billkratzer/zap-game" target="_blank"> Source Code</a> | <a href="credits.html" target="_blank">Credits</a></p>
+  <div id="game"/>
+</body>
+</html>
