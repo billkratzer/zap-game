@@ -24,7 +24,7 @@ class TitleScene extends Phaser.Scene {
             delay: 1000
         });
 
-        let authorText = this.add.bitmapText(0, 0, 'helvetica-neue-thin-gray-24', 'By Bill Kratzer', 24)
+        let authorText = this.add.bitmapText(0, 0, 'helvetica-neue-thin-gray-24', 'By Bill Kratzer & Tayler Ramsay', 24)
         authorText.setOrigin(0.5, 0.5)
         authorText.setPosition(camera.width + authorText.width, camera.centerY * 1.1)
 
