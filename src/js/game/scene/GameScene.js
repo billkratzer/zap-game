@@ -8,6 +8,7 @@ class GameScene extends Phaser.Scene {
         this.texts = {}
         this.sprites = {}
         this.shapes = {}
+        this.timers = {}
     }
 
     preload () {
@@ -20,6 +21,7 @@ class GameScene extends Phaser.Scene {
         state.togglePaused()
 
         if (state.paused) {
+            this.timers.levelTimer.paused = true
             this.layers.modal = this.add.layer().setDepth(1000)
             this.layers.modal.setAlpha(0.85)
             this.layers.modal.setVisible(true)
@@ -39,6 +41,7 @@ class GameScene extends Phaser.Scene {
             this.layers.modal.add([rect, text1, text2, text3])
         }
         else {
+            this.timers.levelTimer.paused = false
             this.layers.modal.destroy()
         }
     }
@@ -79,8 +82,6 @@ class GameScene extends Phaser.Scene {
             .setOrigin(1, 1)
 
         this.layers.info.add([this.texts.score, this.texts.level, this.texts.time])
-
-        this.updateInfo()
 
         // Bottom Layer
         let playerRectBox = this.add.rectangle(unitX * 8, unitY * 5, unitX * 4, unitY * 4, 0xff0000).setOrigin(0, 0)
@@ -175,6 +176,7 @@ class GameScene extends Phaser.Scene {
         }, this);
 
 
+        this.initLevelTimer()
     }
 
     logicalToScreenX(x) {
@@ -300,13 +302,16 @@ class GameScene extends Phaser.Scene {
 
     gameOver() {
         // this.sound.stopAll();
-        // this.scene.start('GameOverScene');
+        this.scene.start('TitleScene');
     }
 
     updateInfo() {
-        this.texts.score.setText("Score : " + globals.gameState.score);
-        this.texts.level.setText("Level : " + globals.gameState.level);
-        this.texts.time.setText("Time : " + 60);
+        this.texts.score.setText("Score : " + globals.gameState.score)
+        this.texts.level.setText("Level : " + globals.gameState.level)
+
+        if (this.timers.levelTimer) {
+            this.texts.time.setText("Time : " + Math.floor(this.timers.levelTimer.getRemainingSeconds()))
+        }
     }
 
     updatePlayerSprite() {
@@ -351,7 +356,20 @@ class GameScene extends Phaser.Scene {
         sprite.setPosition(this.logicalToScreenX(pos.x), this.logicalToScreenY(pos.y))
     }
 
+    initLevelTimer() {
+        if (this.timers.levelTimer) {
+            this.timers.levelTimer.destroy()
+        }
+        this.timers.levelTimer = this.time.addEvent({
+            delay: globals.gameState.getLevelSeconds() * 1000,
+            callback: this.gameOver,
+            callbackScope: this
+        });
+
+    }
+
     update() {
+        this.updateInfo()
     }
 
 }

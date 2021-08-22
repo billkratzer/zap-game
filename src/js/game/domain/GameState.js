@@ -48,6 +48,10 @@ class GameState {
         return types[ Math.floor( Math.random() * types.length)]
     }
 
+    getLevelSeconds() {
+        return 60
+    }
+
     fireMissile() {
         this.firing = {}
 
