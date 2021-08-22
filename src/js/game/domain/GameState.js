@@ -6,6 +6,7 @@ class GameState {
         this.score = 0
         this.level = 1
         this.nextPieceType = null
+        this.paused = false
 
         this.grids = []
         this.leftGrid = new GameGrid(8, 4, Side.LEFT)
@@ -25,6 +26,10 @@ class GameState {
         }
 
         this.player = new Player(PlayerColor.GREEN, this.playerBounds)
+    }
+
+    togglePaused() {
+        this.paused = !this.paused
     }
 
     generateNextPiece() {

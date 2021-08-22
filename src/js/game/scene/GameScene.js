@@ -29,12 +29,46 @@ class GameScene extends Phaser.Scene {
         // }
     }
 
+    togglePause() {
+        let state = globals.gameState
+        state.togglePaused()
+
+        if (state.paused) {
+            this.layers.modal = this.add.layer().setDepth(1000)
+            this.layers.modal.setAlpha(0.85)
+            this.layers.modal.setVisible(true)
+
+            let camera = this.cameras.main
+            let width = camera.width
+            let height = camera.height
+
+            let rect = this.add.rectangle(width / 2, height / 2, width *.60, height * .40, 0x000000)
+                .setOrigin(0.5, 0.5)
+            let text1 = this.add.bitmapText(width / 2, height * 0.40, 'game-font', 'Game Paused', 36)
+                .setOrigin(0.5, 0.5)
+            let text2 = this.add.bitmapText(width / 2, height * 0.55, 'game-font', 'Press [Esc] to resume', 24)
+                .setOrigin(0.5, 0.5)
+            let text3 = this.add.bitmapText(width / 2, height * 0.62, 'game-font', 'Press [q] to quit', 24)
+                .setOrigin(0.5, 0.5)
+            this.layers.modal.add([rect, text1, text2, text3])
+        }
+        else {
+            this.layers.modal.destroy()
+        }
+    }
+
+    quit() {
+        this.scene.start('GameScene');
+    }
+
     create () {
         this.layers.bottom = this.add.layer().setDepth(0)
         this.layers.dots = this.add.layer().setDepth(1)
         this.layers.player = this.add.layer().setDepth(2)
         this.layers.pieces = this.add.layer().setDepth(3)
         this.layers.info = this.add.layer().setDepth(4)
+
+
 
         let camera = this.cameras.main
         let width = camera.width
@@ -226,6 +260,20 @@ class GameScene extends Phaser.Scene {
 
     keyDown(code) {
         console.log("Key Down: " + code)
+        if (globals.gameState.paused) {
+            switch (code) {
+                case "Escape":
+                    this.togglePause();
+                    break;
+                case "q":
+                    if (globals.gameState.paused) {
+                        this.quit();
+                    }
+                    break;
+            }
+            return;
+        }
+
         let player = globals.gameState.player
         switch (code) {
             case "ArrowLeft":
@@ -247,6 +295,9 @@ class GameScene extends Phaser.Scene {
             case "Space":
                 this.fireMissile()
                 break
+            case "Escape":
+                this.togglePause();
+                break;
         }
     }
 
