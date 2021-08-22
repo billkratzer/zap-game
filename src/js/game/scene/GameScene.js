@@ -14,20 +14,6 @@ class GameScene extends Phaser.Scene {
         globals.gameState = new GameState()
     }
 
-    keyPress(code) {
-        // if ((code >= 48) && (57)) {
-        //     this.playNumber(code - 48);
-        // }
-        // else if (code == 8) {
-        //     this.playDelete();
-        // }
-        // else if (code == 13) {
-        //     this.playGuess();
-        // }
-        // else if (code == 27) {
-        //     this.gameOver();
-        // }
-    }
 
     togglePause() {
         let state = globals.gameState
@@ -58,7 +44,7 @@ class GameScene extends Phaser.Scene {
     }
 
     quit() {
-        this.scene.start('GameScene');
+        this.scene.start('TitleScene')
     }
 
     create () {
@@ -265,7 +251,7 @@ class GameScene extends Phaser.Scene {
                 case "Escape":
                     this.togglePause();
                     break;
-                case "q":
+                case "KeyQ":
                     if (globals.gameState.paused) {
                         this.quit();
                     }
