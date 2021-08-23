@@ -243,6 +243,9 @@ class GameScene extends Phaser.Scene {
 
     missileFireEnd() {
         console.log("missile fire end!")
+
+        globals.gameState.firing = false;
+
         this.updatePlayerSprite()
     }
 
