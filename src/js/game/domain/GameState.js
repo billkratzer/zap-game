@@ -103,6 +103,7 @@ class GameState {
 
         let done = false
         while (!done) {
+            console.log("checking at: " + gx + "," + gy);
             if ( grid.inBounds(gx, gy) ) {
                 let piece = grid.getPieceAt(gx, gy)
                 console.log("Grid piece at: " + gx + "," + gy + ": " + piece )
@@ -121,16 +122,32 @@ class GameState {
                 else {
                     gx = gx + dx
                     gy = gy + dy
-                    mx = mx + dx
-                    my = my + dy
                 }
             }
             else {
+                console.log("Out of bounds");
                 done = true
             }
         }
 
         // mx and mx represent the final state of the bullet
+        console.log("Done: mx = " + mx + ", my = " + my)
+        console.log("Done: gx = " + gx + ", gy = " + gy)
+        switch (this.player.direction) {
+            case PlayerDirection.UP:
+                my = gy
+                break;
+            case PlayerDirection.DOWN:
+                my = gy + 9
+                break;
+            case PlayerDirection.LEFT:
+                mx = gx
+                break;
+            case PlayerDirection.RIGHT:
+                mx = gx + 12
+                break;
+        }
+        console.log("Done: mx = " + mx + ", my = " + my)
         this.firing.endPos = {
             x: mx,
             y: my
