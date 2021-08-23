@@ -26,12 +26,14 @@ class Player {
     }
 
     handleInputDirection(direction) {
-        if (direction === this.direction) {
-            this.moveDirection(direction)
-        }
-        else {
-            this.direction = direction;
-        }
+        // if (direction === this.direction) {
+        //     this.moveDirection(direction)
+        // }
+        // else {
+        //     this.direction = direction;
+        // }
+        this.moveDirection(direction)
+        this.direction = direction;
     }
 
     moveDirection(direction) {
