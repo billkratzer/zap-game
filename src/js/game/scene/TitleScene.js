@@ -76,7 +76,8 @@ class TitleScene extends Phaser.Scene {
 
     nextScene() {
         // this.introMusic.stop();
-        this.scene.start('GameScene');
+        // this.scene.start('GameScene');
+        this.scene.start('TestScene');
     }
 
     update() {
