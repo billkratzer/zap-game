@@ -1,3 +1,9 @@
+const GameEvent = {
+    PIECE_MOVE: "on-piece-move",
+    PIECE_EXPLODE: "on-piece-explode"
+}
+
+
 class GameState {
 
     constructor() {
@@ -5,14 +11,16 @@ class GameState {
         this.lives = 3
         this.score = 0
         this.level = 1
-        this.nextPieceType = null
+        this.nextPieceType = this.getRandomPieceType()
         this.paused = false
 
+        this.eventHandlers = []
+
         this.grids = []
-        this.leftGrid = new GameGrid(8, 4, Side.LEFT)
-        this.rightGrid = new GameGrid(8, 4, Side.RIGHT)
-        this.topGrid = new GameGrid(4, 5, Side.TOP)
-        this.bottomGrid = new GameGrid(4, 5, Side.BOTTOM)
+        this.leftGrid = new GameGrid(8, 4, Side.LEFT, { x: 0, y: 5})
+        this.rightGrid = new GameGrid(8, 4, Side.RIGHT, { x: 12, y: 5})
+        this.topGrid = new GameGrid(4, 5, Side.TOP, { x: 8, y: 0})
+        this.bottomGrid = new GameGrid(4, 5, Side.BOTTOM, {x: 8, y: 9})
 
         this.grids.push(this.leftGrid, this.rightGrid, this.topGrid, this.bottomGrid)
 
@@ -33,9 +41,29 @@ class GameState {
     }
 
     generateNextPiece() {
+        let grid = this.selectRandomGrid()
+        let piece = grid.addPiece(this.nextPieceType)
+
+        let handler = this.eventHandlers[GameEvent.PIECE_MOVE]
+
+        if (handler) {
+            let movingPieces = grid.getMovingPieces()
+            if (movingPieces) {
+                for (var i = 0; i < movingPieces.length; i++) {
+                    let mp = movingPieces[i]
+                    handler.callback(mp, handler.context)
+                }
+            }
+
+            handler.callback(grid.newPiece, handler.context)
+        }
+
+
+
         let type = this.getRandomPieceType()
-        this.selectRandomGrid().addPiece(type)
         this.nextPieceType = type
+
+        return piece
     }
 
     selectRandomGrid() {
@@ -50,6 +78,21 @@ class GameState {
 
     getLevelSeconds() {
         return 60
+    }
+
+    on(event, callback, context) {
+        this.eventHandlers[event] = { callback: callback, context: context }
+    }
+
+    getNewPieceSeconds() {
+        return 5
+    }
+
+    commitMoves() {
+        for (var i = 0; i < this.grids.length; i++) {
+            let grid = grids[i]
+            grid.commitMoves()
+        }
     }
 
     fireMissile() {

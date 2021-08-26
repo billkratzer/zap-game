@@ -7,10 +7,11 @@ const Side = {
 
 class GameGrid {
 
-    constructor(width, height, side) {
+    constructor(width, height, side, translate) {
 
         this.width = width
         this.height = height
+        this.translate = translate
 
         // this is the side where new pieces come from
         this.side = side
@@ -76,34 +77,36 @@ class GameGrid {
 
         switch (this.side) {
             case Side.TOP:
-                x = randomInt(width)
+                x = this.randomInt(this.width)
                 y = 0
                 shiftX = 0
                 shiftY = 1
                 break
             case Side.BOTTOM:
-                x = randomInt(width)
-                y = height - 1
+                x = this.randomInt(this.width)
+                y = this.height - 1
                 shiftX = 0
                 shiftY = -1
                 break
             case Side.LEFT:
                 x = 0
-                y = this.randomInt(height)
+                y = this.randomInt(this.height)
                 shiftX = 1
                 shiftY = 0
                 break
             case Side.RIGHT:
-                x = width - 1
-                y = this.randomInt(height)
+                x = this.width - 1
+                y = this.randomInt(this.height)
                 shiftX = -1
                 break
             default:
                 throw new Error("Invalid value for side: " + this.side)
         }
 
-        this.nextPiece = new GamePiece(type)
-        this.nextPiece.setNewPosition(x, y)
+        let newPiece = new GamePiece(type, this.translate)
+        newPiece.setPosition(x - shiftX, y - shiftY)
+        newPiece.setNewPosition(x, y)
+        this.newPiece = newPiece
 
         var done = false
         while ( !done ) {
@@ -116,32 +119,49 @@ class GameGrid {
             else {
                 done = true
             }
-            if (( x < 0 ) || ( x >= width )) {
+            if (( x < 0 ) || ( x >= this.width )) {
                 done = true
             }
-            if (( y < 0 ) || ( y >= height )) {
+            if (( y < 0 ) || ( y >= this.height )) {
                 done = true
             }
 
         }
+
+        return newPiece
     }
 
-    finalizePieceMoves() {
-        let savedPieces = []
+    getMovingPieces() {
+        let moving = []
 
-        for (let x = 0; x < width; x++) {
-            for (let y = 0; y < height; y++) {
+        for (let x = 0; x < this.width; x++) {
+            for (let y = 0; y < this.height; y++) {
                 let piece = this.getPieceAt(x, y)
                 if ( piece && piece.isMoving() ) {
-                    savedPieces.push(piece)
+                    moving.push(piece)
+                }
+            }
+        }
+
+        return moving
+    }
+
+    commitMoves() {
+        let movingPieces = []
+
+        for (let x = 0; x < this.width; x++) {
+            for (let y = 0; y < this.height; y++) {
+                let piece = this.getPieceAt(x, y)
+                if ( piece && piece.isMoving() ) {
+                    movingPieces.push(piece)
                     this.setPieceAt(x, y, null)
                 }
             }
         }
 
-        for (let i = 0; i < savedPieces.length; i++ ) {
-            savedPieces[i].moveToNewPosition()
-            let pos = savedPieces[i].getPosition()
+        for (let i = 0; i < movingPieces.length; i++ ) {
+            movingPieces[i].moveToNewPosition()
+            let pos = movingPieces[i].getPosition()
             this.setPieceAt(pos.x, pos.y, savedPieces[i])
 
             if ((pos.x < 0) || (pos.x >= width)) {
@@ -152,11 +172,11 @@ class GameGrid {
             }
         }
 
-        this.nextPiece.moveToNewPosition()
-        let pos = this.nextPiece.getPosition()
-        this.setPieceAt(pos.x, pos.y, this.nextPiece)
+        this.newPiece.moveToNewPosition()
+        let pos = this.newPiece.getPosition()
+        this.setPieceAt(pos.x, pos.y, this.newPiece)
 
-        this.nextPiece = null
+        this.newPiece = null
     }
 
 }
