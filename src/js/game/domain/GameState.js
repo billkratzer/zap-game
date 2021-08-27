@@ -8,11 +8,15 @@ class GameState {
         this.nextPieceType = null
         this.paused = false
 
+        this.BOARD_WIDTH = 20
+        this.BOARD_HEIGHT = 14
+
+
         this.grids = []
-        this.leftGrid = new GameGrid(8, 4, Side.LEFT)
-        this.rightGrid = new GameGrid(8, 4, Side.RIGHT)
-        this.topGrid = new GameGrid(4, 5, Side.TOP)
-        this.bottomGrid = new GameGrid(4, 5, Side.BOTTOM)
+        this.leftGrid = new GameGrid(8, 4, Side.LEFT, 0, 5)
+        this.rightGrid = new GameGrid(8, 4, Side.RIGHT, 12, 5)
+        this.topGrid = new GameGrid(4, 5, Side.TOP, 8, 0)
+        this.bottomGrid = new GameGrid(4, 5, Side.BOTTOM, 8, 9)
 
         this.grids.push(this.leftGrid, this.rightGrid, this.topGrid, this.bottomGrid)
 
@@ -32,10 +36,9 @@ class GameState {
         this.paused = !this.paused
     }
 
-    generateNextPiece() {
+    addNewPiece(scene, layer) {
         let type = this.getRandomPieceType()
-        this.selectRandomGrid().addPiece(type)
-        this.nextPieceType = type
+        this.selectRandomGrid().addNewPiece(type, scene, layer)
     }
 
     selectRandomGrid() {

@@ -12,15 +12,16 @@ class GameScene extends Phaser.Scene {
     }
 
     preload () {
-        globals.gameState = new GameState()
+        globals.state = new GameState()
+        globals.animationFactory = new AnimationFactory(this)
     }
 
 
     togglePause() {
-        let state = globals.gameState
+        let state = globals.state
         state.togglePaused()
 
-        if (state.paused) {
+        if (globals.state.paused) {
             this.timers.levelTimer.paused = true
             this.layers.modal = this.add.layer().setDepth(1000)
             this.layers.modal.setAlpha(0.85)
@@ -32,12 +33,16 @@ class GameScene extends Phaser.Scene {
 
             let rect = this.add.rectangle(width / 2, height / 2, width *.60, height * .40, 0x000000)
                 .setOrigin(0.5, 0.5)
+
             let text1 = this.add.bitmapText(width / 2, height * 0.40, 'game-font', 'Game Paused', 36)
                 .setOrigin(0.5, 0.5)
+
             let text2 = this.add.bitmapText(width / 2, height * 0.55, 'game-font', 'Press [Esc] to resume', 24)
                 .setOrigin(0.5, 0.5)
+
             let text3 = this.add.bitmapText(width / 2, height * 0.62, 'game-font', 'Press [q] to quit', 24)
                 .setOrigin(0.5, 0.5)
+
             this.layers.modal.add([rect, text1, text2, text3])
         }
         else {
@@ -51,6 +56,11 @@ class GameScene extends Phaser.Scene {
     }
 
     create () {
+        let camera = this.cameras.main
+        camera.setBackgroundColor("#333")
+
+        globals.coords = new ScreenCoords(camera.width, camera.height, globals.state.BOARD_WIDTH, globals.state.BOARD_HEIGHT)
+
         this.layers.bottom = this.add.layer().setDepth(0)
         this.layers.dots = this.add.layer().setDepth(1)
         this.layers.player = this.add.layer().setDepth(2)
@@ -58,113 +68,135 @@ class GameScene extends Phaser.Scene {
         this.layers.info = this.add.layer().setDepth(4)
 
 
-
-        let camera = this.cameras.main
-        let width = camera.width
-        let height = camera.height
-
-        camera.setBackgroundColor("#333")
-
-        let unitX = width / 20
-        let unitY = height / 14
-
-        this.unitX = unitX
-        this.unitY = unitY
-
         // Info Layer
-        this.texts.score = this.add.bitmapText(0 + 10, 0, 'game-font', 'Score: ', 32)
+        this.texts.score = this.add.bitmapText(
+            0 + 10,
+            0,
+            'game-font',
+            'Score: ',
+            32)
             .setOrigin(0, 0)
 
-        this.texts.level = this.add.bitmapText(width - 10, 0, 'game-font', 'Level: ', 32)
+        this.texts.level = this.add.bitmapText(
+            globals.coords.screenWidth - 10,
+            0,
+            'game-font',
+            'Level: ',
+            32)
             .setOrigin(1, 0)
 
-        this.texts.time = this.add.bitmapText(width - 10, height - 10, 'game-font', 'Time: ', 32)
+        this.texts.time = this.add.bitmapText(
+            globals.coords.screenWidth - 10,
+            globals.coords.screenJeight - 10,
+            'game-font',
+            'Time: ',
+            32)
             .setOrigin(1, 1)
 
         this.layers.info.add([this.texts.score, this.texts.level, this.texts.time])
 
+
         // Bottom Layer
-        let playerRectBox = this.add.rectangle(unitX * 8, unitY * 5, unitX * 4, unitY * 4, 0xff0000).setOrigin(0, 0)
+        let playerRectBox = this.add.rectangle(
+            globals.coords.getScreenMiddleX(),
+            globals.coords.getScreenMiddleY(),
+            globals.coords.boardXUnits(4),
+            globals.coords.boardYUnits(4),
+            0xff0000)
+            .setOrigin(0.5, 0.5)
         this.layers.bottom.add(playerRectBox)
 
+
         // Dots Layer
-        for (let x = 0; x < unitX; x++) {
+        for (let x = 0; x < globals.state.BOARD_WIDTH; x++) {
             for (let y = 5; y < 9; y++) {
-                let dot = this.add.circle(x * unitX + unitX / 2, y * unitY + unitY / 2, 2, 0xffffff).setOrigin(0.5, 0.5)
+                let dot = this.add.circle(
+                    globals.coords.boardXToScreenX(x),
+                    globals.coords.boardYToScreenY(y),
+                    2,
+                    0xffffff)
+                    .setOrigin(0.5, 0.5)
                 this.layers.dots.add(dot)
             }
         }
 
         for (let x = 8; x < 12; x++) {
-            for (let y = 0; y < 14; y++) {
-                let dot = this.add.circle(x * unitX + unitX / 2, y * unitY + unitY / 2, 2, 0xffffff).setOrigin(0.5, 0.5)
+            for (let y = 0; y < globals.state.BOARD_HEIGHT; y++) {
+                let dot = this.add.circle(
+                    globals.coords.boardXToScreenX(x),
+                    globals.coords.boardYToScreenY(y),
+                    2,
+                    0xffffff)
+                    .setOrigin(0.5, 0.5)
                 this.layers.dots.add(dot)
             }
         }
 
         // Player Layer
         // Animation set
-        this.anims.create({
-            key: "player-green",
-            frames: this.anims.generateFrameNumbers('sprites', { frames: [ 0, 1, 2, 3 ] }),
-            frameRate: 8,
-            repeat: -1
-        });
-
-        this.anims.create({
-            key: "player-blue",
-            frames: this.anims.generateFrameNumbers('sprites', { frames: [ 4, 5, 6, 7 ] }),
-            frameRate: 1,
-            repeat: -1
-        });
-
-        this.anims.create({
-            key: "player-orange",
-            frames: this.anims.generateFrameNumbers('sprites', { frames: [ 8, 9, 10, 11 ] }),
-            frameRate: 8,
-            repeat: -1
-        });
-
-        this.anims.create({
-            key: "player-purple",
-            frames: this.anims.generateFrameNumbers('sprites', { frames: [ 12, 13, 14, 15 ] }),
-            frameRate: 8,
-            repeat: -1
-        });
+        // this.anims.create({
+        //     key: "player-green",
+        //     frames: this.anims.generateFrameNumbers('sprites', { frames: [ 0, 1, 2, 3 ] }),
+        //     frameRate: 8,
+        //     repeat: -1
+        // });
+        //
+        // this.anims.create({
+        //     key: "player-blue",
+        //     frames: this.anims.generateFrameNumbers('sprites', { frames: [ 4, 5, 6, 7 ] }),
+        //     frameRate: 1,
+        //     repeat: -1
+        // });
+        //
+        // this.anims.create({
+        //     key: "player-orange",
+        //     frames: this.anims.generateFrameNumbers('sprites', { frames: [ 8, 9, 10, 11 ] }),
+        //     frameRate: 8,
+        //     repeat: -1
+        // });
+        //
+        // this.anims.create({
+        //     key: "player-purple",
+        //     frames: this.anims.generateFrameNumbers('sprites', { frames: [ 12, 13, 14, 15 ] }),
+        //     frameRate: 8,
+        //     repeat: -1
+        // });
 
         // this.sprites.player = this.add.sprite(unitX * 9, unitY * 9)
         //     .setScale(3)
         //     .play("player-blue")
 
-        this.sprites.player = this.add.sprite(0, 0, "sprites", 0)
-            .setScale(3)
-        this.layers.player.add(this.sprites.player)
+        // Player Layer
+        let playerSprite = this.add.sprite(0, 0, "sprites", 0).setScale(3)
+        this.layers.player.add(playerSprite)
 
-        this.updatePlayerSprite()
+        // wire the player sprite into the player object
+        globals.state.player.setScene(this)
+        globals.state.player.setSprite(playerSprite)
 
         //this.spriteIndex = 0
 
         // Piece Layer
         // Animation set
-        this.anims.create({
-            key: "piece-green-down",
-            frames: this.anims.generateFrameNumbers('sprites', { frames: [ 16, 17, 18, 19 ] }),
-            frameRate: 1,
-            repeat: -1
-        });
-
-        this.anims.create({
-            key: "piece-green",
-            frames: this.anims.generateFrameNumbers('sprites', { frames: [ 16 ] }),
-            repeat: 0
-        });
-
-        let greenPiece = this.add.sprite(unitX * 9 + 2, unitY * 1)
-            .setScale(3)
-            .setOrigin(0, 0)
-            .play("piece-green")
-
-        this.layers.pieces.add(greenPiece)
+        // this.anims.create({
+        //     key: "piece-green-down",
+        //     frames: this.anims.generateFrameNumbers('sprites', { frames: [ 16, 17, 18, 19 ] }),
+        //     frameRate: 1,
+        //     repeat: -1
+        // });
+        //
+        // this.anims.create({
+        //     key: "piece-green",
+        //     frames: this.anims.generateFrameNumbers('sprites', { frames: [ 16 ] }),
+        //     repeat: 0
+        // });
+        //
+        // let greenPiece = this.add.sprite(unitX * 9 + 2, unitY * 1)
+        //     .setScale(3)
+        //     .setOrigin(0, 0)
+        //     .play("piece-green")
+        //
+        // this.layers.pieces.add(greenPiece)
 
         // Events
 
@@ -179,16 +211,8 @@ class GameScene extends Phaser.Scene {
         this.initLevelTimer()
     }
 
-    logicalToScreenX(x) {
-        return x * this.unitX + this.unitX / 2 + 4
-    }
-
-    logicalToScreenY(y) {
-        return y * this.unitY + this.unitY / 2 + 4
-    }
-
     fireMissile() {
-        let state = globals.gameState
+        let state = globals.state
 
         // if we are already firing, do nothing
         if (state.firing) {
@@ -201,11 +225,11 @@ class GameScene extends Phaser.Scene {
         // get the end state
         let endPos = state.firing.endPos
 
-        let startX = this.logicalToScreenX(state.player.x)
-        let startY = this.logicalToScreenY(state.player.y)
+        let startX = globals.coords.boardXToScreenX(state.player.x)
+        let startY = globals.coords.boardYToScreenY(state.player.y)
 
-        let endX = this.logicalToScreenX(endPos.x)
-        let endY = this.logicalToScreenY(endPos.y)
+        let endX = globals.coords.boardXToScreenX(endPos.x)
+        let endY = globals.coords.boardYToScreenY(endPos.y)
 
         console.log("Player Pos: " + state.player.x + "," + state.player.y)
         console.log("End Pos: " + endPos.x + "," + endPos.y)
@@ -224,10 +248,10 @@ class GameScene extends Phaser.Scene {
     }
 
     missileFireBounce() {
-        let state = globals.gameState
+        let state = globals.state
 
-        let playerX = this.logicalToScreenX(state.player.x)
-        let playerY = this.logicalToScreenX(state.player.y)
+        let playerX = globals.coords.boardXToScreenX(state.player.x)
+        let playerY = globals.coords.boardYToScreenY(state.player.y)
 
         console.log("missile fire bounce!")
         this.tweens.add({
@@ -244,20 +268,20 @@ class GameScene extends Phaser.Scene {
     missileFireEnd() {
         console.log("missile fire end!")
 
-        globals.gameState.firing = false;
+        globals.state.firing = false;
 
         this.updatePlayerSprite()
     }
 
     keyDown(code) {
         console.log("Key Down: " + code)
-        if (globals.gameState.paused) {
+        if (globals.state.paused) {
             switch (code) {
                 case "Escape":
                     this.togglePause();
                     break;
                 case "KeyQ":
-                    if (globals.gameState.paused) {
+                    if (globals.state.paused) {
                         this.quit();
                     }
                     break;
@@ -265,23 +289,18 @@ class GameScene extends Phaser.Scene {
             return;
         }
 
-        let player = globals.gameState.player
         switch (code) {
             case "ArrowLeft":
-                player.handleInputDirection(PlayerDirection.LEFT)
-                this.updatePlayerSprite()
+                globals.state.player.move(Direction.LEFT, -1, 0)
                 break
             case "ArrowRight":
-                player.handleInputDirection(PlayerDirection.RIGHT)
-                this.updatePlayerSprite()
+                globals.state.player.move(Direction.RIGHT, 1, 0)
                 break
             case "ArrowUp":
-                player.handleInputDirection(PlayerDirection.UP)
-                this.updatePlayerSprite()
+                globals.state.player.move(Direction.UP, 0, -1)
                 break
             case "ArrowDown":
-                player.handleInputDirection(PlayerDirection.DOWN)
-                this.updatePlayerSprite()
+                globals.state.player.move(Direction.DOWN, 0, 1)
                 break
             case "Space":
                 this.fireMissile()
@@ -293,6 +312,7 @@ class GameScene extends Phaser.Scene {
     }
 
     click(pointer, localX, localY, event) {
+        globals.state.addNewPiece(this, this.layers.pieces)
         //this.layers.bottom.setVisible(!this.layers.bottom.visible)
 
         // this.spriteIndex++
@@ -309,62 +329,21 @@ class GameScene extends Phaser.Scene {
     }
 
     updateInfo() {
-        this.texts.score.setText("Score : " + globals.gameState.score)
-        this.texts.level.setText("Level : " + globals.gameState.level)
+        this.texts.score.setText("Score : " + globals.state.score)
+        this.texts.level.setText("Level : " + globals.state.level)
 
         if (this.timers.levelTimer) {
             this.texts.time.setText("Time : " + Math.floor(this.timers.levelTimer.getRemainingSeconds()))
         }
     }
 
-    updatePlayerSprite() {
-        let sprite = this.sprites.player
-        let player = globals.gameState.player
-
-        let colorOffset = 0
-        switch (player.color) {
-            case PlayerColor.GREEN:
-                colorOffset = 0
-                break
-            case PlayerColor.BLUE:
-                colorOffset = 4
-                break
-            case PlayerColor.ORANGE:
-                colorOffset = 8
-                break
-            case PlayerColor.PURPLE:
-                colorOffset = 12
-                break
-        }
-
-        let dirOffset = 0
-        switch (player.direction) {
-            case PlayerDirection.UP:
-                dirOffset = 2
-                break
-            case PlayerDirection.DOWN:
-                dirOffset = 0
-                break
-            case PlayerDirection.LEFT:
-                dirOffset = 3
-                break
-            case PlayerDirection.RIGHT:
-                dirOffset = 1
-                break
-        }
-        sprite.setFrame(colorOffset + dirOffset)
-
-        // Position
-        let pos = player.getPosition()
-        sprite.setPosition(this.logicalToScreenX(pos.x), this.logicalToScreenY(pos.y))
-    }
 
     initLevelTimer() {
         if (this.timers.levelTimer) {
             this.timers.levelTimer.destroy()
         }
         this.timers.levelTimer = this.time.addEvent({
-            delay: globals.gameState.getLevelSeconds() * 1000,
+            delay: globals.state.getLevelSeconds() * 1000,
             callback: this.gameOver,
             callbackScope: this
         });

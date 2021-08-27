@@ -1,23 +1,23 @@
 const PlayerColor = {
-    GREEN: "green",
-    BLUE: "blue",
-    ORANGE: "orange",
-    PURPLE: "purple",
+    GREEN: PieceType.GREEN,
+    BLUE: PieceType.BLUE,
+    ORANGE: PieceType.ORANGE,
+    PURPLE: PieceType.PURPLE,
 }
 
-const PlayerDirection = {
-    UP: "up",
-    DOWN: "down",
-    LEFT: "left",
-    RIGHT: "right",
-}
+
 
 class Player {
 
     constructor(color, bounds) {
         this.color = color
         this.bounds = bounds
-        this.direction = PlayerDirection.UP
+        this.direction = Direction.UP
+
+        this.scene = null
+        this.sprite = null
+
+        this.moving = false
 
         this.setPosition(
             Math.floor((this.bounds.minX + this.bounds.maxX) / 2),
@@ -25,46 +25,73 @@ class Player {
         )
     }
 
-    handleInputDirection(direction) {
-        // if (direction === this.direction) {
-        //     this.moveDirection(direction)
-        // }
-        // else {
-        //     this.direction = direction;
-        // }
-        this.moveDirection(direction)
-        this.direction = direction;
+    move(direction, dx, dy) {
+
+        if (this.moving) {
+            return
+        }
+
+        this.moving = true
+        this.direction = direction
+
+        this.x = this.x + dx
+        if (this.x < this.bounds.minX) {
+            this.x = this.bounds.minX
+            this.moving = false
+        }
+        if (this.x > this.bounds.maxX) {
+            this.x = this.bounds.maxX
+            this.moving = false
+        }
+
+        this.y = this.y + dy
+        if (this.y < this.bounds.minY) {
+            this.y = this.bounds.minY
+            this.moving = false
+        }
+        if (this.y > this.bounds.maxY) {
+            this.y = this.bounds.maxY
+            this.moving = false
+        }
+
+        this.sprite.play("player-" + this.color + "-" + this.direction)
+
+        if (!this.moving) {
+            return
+        }
+
+        this.scene.tweens.add({
+            targets: this.sprite,
+            x: globals.coords.boardXToScreenX(this.x),
+            y: globals.coords.boardYToScreenY(this.y),
+            duration: 100,
+            delay: 0,
+            onComplete: this.endMoveSprite,
+            onCompleteScope: this
+        })
     }
 
-    moveDirection(direction) {
-        switch (direction) {
-            case PlayerDirection.LEFT:
-                this.x = this.x - 1
-                if (this.x < this.bounds.minX) {
-                    this.x = this.bounds.minX
-                }
-                break;
-            case PlayerDirection.RIGHT:
-                this.x = this.x + 1
-                if (this.x > this.bounds.maxX) {
-                    this.x = this.bounds.maxX
-                }
-                break;
-            case PlayerDirection.UP:
-                this.y = this.y - 1
-                if (this.y < this.bounds.minY) {
-                    this.y = this.bounds.minY
-                }
-                break;
-            case PlayerDirection.DOWN:
-                this.y = this.y + 1
-                if (this.y > this.bounds.maxY) {
-                    this.y = this.bounds.maxY
-                }
-                break;
-            default:
-                throw Error("Invalid direction: " + direction)
-        }
+    endMoveSprite() {
+        this.sprite.play("player-" + this.color + "-" + this.direction)
+        this.moving = false
+    }
+
+    setScene(scene) {
+        this.scene = scene
+    }
+
+    setSprite(sprite) {
+        this.sprite = sprite
+
+        this.sprite.setOrigin(0.5, 0.5)
+        this.sprite.setPosition(
+            globals.coords.boardXToScreenX(this.x),
+            globals.coords.boardYToScreenY(this.y)
+        )
+    }
+
+    changeColor(newColor) {
+        this.color = newColor
     }
 
     setPosition(x , y) {

@@ -1,19 +1,23 @@
 const Side = {
-    LEFT: "left",
-    RIGHT: "right",
     TOP: "top",
-    BOTTOM: "bottom"
+    BOTTOM: "bottom",
+    LEFT: "left",
+    RIGHT: "right"
 }
+
 
 class GameGrid {
 
-    constructor(width, height, side) {
+    constructor(width, height, side, addX, addY) {
 
         this.width = width
         this.height = height
-
-        // this is the side where new pieces come from
         this.side = side
+
+        this.translate = {
+            x: addX,
+            y: addY
+        }
 
         this.overflow = false
 
@@ -22,6 +26,37 @@ class GameGrid {
             this.grid[i] = new Array(height)
         }
         
+    }
+
+    fromBoardXToGridX(boardX) {
+        return ( boardX - this.translate.x )
+    }
+
+    fromBoardYToGridY(boardY) {
+        return ( boardY - this.translate.y )
+    }
+
+
+    fromBoardPosToGridPos(x, y) {
+        return {
+            x: this.fromBoardXToGridX(x),
+            y: this.fromBoardYToGridY(y)
+        }
+    }
+
+    fromGridXToBoardX(gridX) {
+        return gridX + this.translate.x
+    }
+
+    fromGridYToBoardY(gridY) {
+        return gridY + this.translate.y
+    }
+
+    fromGridPosToBoardPos(x, y) {
+        return {
+            x: this.fromGridXToBoardX(x),
+            y: this.fromGridYToBoardY(y)
+        }
     }
 
     clear() {
@@ -56,15 +91,11 @@ class GameGrid {
         this.grid[x][y] = piece
     }
 
-    isOverflow() {
-        return this.overflow
-    }
-
     randomInt(upper) {
         return Math.floor(Math.random() * upper);
     }
 
-    addPiece(type) {
+    addNewPiece(type, scene, layer) {
         var x = 0
         var y = 0
         var shiftX = 0
@@ -74,36 +105,42 @@ class GameGrid {
             throw new Error("Side is not defined!")
         }
 
+        let facing = ""
         switch (this.side) {
             case Side.TOP:
-                x = randomInt(width)
+                x = this.randomInt(this.width)
                 y = 0
                 shiftX = 0
                 shiftY = 1
+                facing = Direction.DOWN
                 break
             case Side.BOTTOM:
-                x = randomInt(width)
-                y = height - 1
+                x = this.randomInt(this.width)
+                y = this.height - 1
                 shiftX = 0
                 shiftY = -1
+                facing = Direction.UP
                 break
             case Side.LEFT:
                 x = 0
-                y = this.randomInt(height)
+                y = this.randomInt(this.height)
                 shiftX = 1
                 shiftY = 0
+                facing = Direction.RIGHT
                 break
             case Side.RIGHT:
-                x = width - 1
-                y = this.randomInt(height)
+                x = this.width - 1
+                y = this.randomInt(this.height)
+                facing = Direction.LEFT
                 shiftX = -1
                 break
             default:
                 throw new Error("Invalid value for side: " + this.side)
         }
 
-        this.nextPiece = new GamePiece(type)
-        this.nextPiece.setNewPosition(x, y)
+        let newPiece = new GamePiece(type, facing, this, scene, layer)
+        newPiece.setPosition(x, y)
+        newPiece.animateIn()
 
         var done = false
         while ( !done ) {
@@ -116,10 +153,10 @@ class GameGrid {
             else {
                 done = true
             }
-            if (( x < 0 ) || ( x >= width )) {
+            if (( x < 0 ) || ( x >= this.width )) {
                 done = true
             }
-            if (( y < 0 ) || ( y >= height )) {
+            if (( y < 0 ) || ( y >= this.height )) {
                 done = true
             }
 
@@ -129,8 +166,8 @@ class GameGrid {
     finalizePieceMoves() {
         let savedPieces = []
 
-        for (let x = 0; x < width; x++) {
-            for (let y = 0; y < height; y++) {
+        for (let x = 0; x <this.width; x++) {
+            for (let y = 0; y < this.height; y++) {
                 let piece = this.getPieceAt(x, y)
                 if ( piece && piece.isMoving() ) {
                     savedPieces.push(piece)

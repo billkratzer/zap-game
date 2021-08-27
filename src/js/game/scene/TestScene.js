@@ -11,6 +11,7 @@ class TestScene extends Phaser.Scene {
         this.shapes = {}
         this.timers = {}
         this.tools = {}
+        this.colors = ["green", "blue", "orange", "purple"]
     }
 
     preload () {
@@ -138,21 +139,25 @@ class TestScene extends Phaser.Scene {
             repeat: 0
         });
 
-        let greenPiece = this.add.sprite(this.coords.boardXToScreenX(6), this.coords.boardXToScreenX(2))
+        let piece = this.add.sprite(this.coords.boardXToScreenX(6), this.coords.boardXToScreenX(2))
             .setScale(3)
             .setOrigin(0, 0)
             .play("piece-green-move-down")
 
-        this.layers.pieces.add(greenPiece)
+        this.layers.pieces.add(piece)
 
-        return
-
-
+        this.piece = {}
+        this.piece.sprite = piece
+        this.piece.x = 6
+        this.piece.y = 2
+        this.piece.colorIndex = 0
+        this.piece.direction = "down"
         // Events
 
         this.input.on('pointerdown', this.click, this);
 
         this.input.keyboard.on('keydown', function (event) {
+            console.log("input!")
             this.keyDown(event.code);
         }, this);
 
@@ -169,6 +174,90 @@ class TestScene extends Phaser.Scene {
 
     keyDown(code) {
         console.log("Key Down: " + code)
+        switch (code) {
+            case "ArrowUp":
+                this.move("up", 0, -1)
+                break;
+
+            case "ArrowDown":
+                this.move("down", 0, 1)
+                break;
+            case "ArrowLeft":
+                this.move("left", -1, 0)
+                break;
+            case "ArrowRight":
+                this.move("right", 1, 0)
+                break;
+            case "Space":
+                this.rotateColor()
+                break;
+        }
+    }
+
+    rotateColor() {
+        if (this.piece.moving) {
+            return
+        }
+        this.piece.colorIndex++;
+        if (this.piece.colorIndex > 3) {
+            this.piece.colorIndex = 0
+        }
+        let color = this.colors[this.piece.colorIndex]
+
+        this.piece.sprite.play("piece-" + color + "-resting-" + this.piece.direction)
+    }
+
+    move(direction, dx, dy) {
+        if (this.piece.moving) {
+            return
+        }
+        this.piece.moving = true
+        this.piece.direction = direction
+
+        this.piece.x = this.piece.x + dx
+        if (this.piece.x < 0) {
+            this.piece.x = 0
+            this.piece.moving = false
+        }
+        if (this.piece.x > 20) {
+            this.piece.x = 20
+            this.piece.moving = false
+        }
+
+        this.piece.y = this.piece.y + dy
+        if (this.piece.y < 0) {
+            this.piece.y = 0
+            this.piece.moving = false
+        }
+        if (this.piece.y > 14) {
+            this.piece.y = 14
+            this.piece.moving = false
+        }
+
+        if (!this.piece.moving) {
+            return
+        }
+
+        this.tweens.add({
+            targets: this.piece.sprite,
+            x: this.coords.boardXToScreenX(this.piece.x),
+            y:  this.coords.boardXToScreenX(this.piece.y),
+            duration: 1000,
+            delay: 0,
+            onComplete: this.stopPiece,
+            onCompleteScope: this
+        })
+
+        let color = this.colors[this.piece.colorIndex]
+        this.piece.sprite.play("piece-" + color + "-move-" + direction)
+
+    }
+
+    stopPiece() {
+        console.log("this.piece: " + this)
+        let color = this.colors[this.piece.colorIndex]
+        this.piece.sprite.play("piece-" + color + "-resting-" + this.piece.direction)
+        this.piece.moving = false
     }
 
     click(pointer, localX, localY, event) {
