@@ -161,24 +161,41 @@ class GameGrid {
             }
 
         }
+
+        return newPiece
     }
 
-    finalizePieceMoves() {
-        let savedPieces = []
+    getMovingPieces() {
+        let moving = []
+
+        for (let x = 0; x < this.width; x++) {
+            for (let y = 0; y < this.height; y++) {
+                let piece = this.getPieceAt(x, y)
+                if ( piece && piece.isMoving() ) {
+                    moving.push(piece)
+                }
+            }
+        }
+
+        return moving
+    }
+
+    commitMoves() {
+        let movingPieces = []
 
         for (let x = 0; x <this.width; x++) {
             for (let y = 0; y < this.height; y++) {
                 let piece = this.getPieceAt(x, y)
                 if ( piece && piece.isMoving() ) {
-                    savedPieces.push(piece)
+                    movingPieces.push(piece)
                     this.setPieceAt(x, y, null)
                 }
             }
         }
 
-        for (let i = 0; i < savedPieces.length; i++ ) {
-            savedPieces[i].moveToNewPosition()
-            let pos = savedPieces[i].getPosition()
+        for (let i = 0; i < movingPieces.length; i++ ) {
+            movingPieces[i].moveToNewPosition()
+            let pos = movingPieces[i].getPosition()
             this.setPieceAt(pos.x, pos.y, savedPieces[i])
 
             if ((pos.x < 0) || (pos.x >= width)) {
@@ -189,11 +206,11 @@ class GameGrid {
             }
         }
 
-        this.nextPiece.moveToNewPosition()
-        let pos = this.nextPiece.getPosition()
-        this.setPieceAt(pos.x, pos.y, this.nextPiece)
+        this.newPiece.moveToNewPosition()
+        let pos = this.newPiece.getPosition()
+        this.setPieceAt(pos.x, pos.y, this.newPiece)
 
-        this.nextPiece = null
+        this.newPiece = null
     }
 
 }

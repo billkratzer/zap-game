@@ -23,6 +23,7 @@ class GameScene extends Phaser.Scene {
 
         if (globals.state.paused) {
             this.timers.levelTimer.paused = true
+            this.timers.newPieceTimer.paused = true
             this.layers.modal = this.add.layer().setDepth(1000)
             this.layers.modal.setAlpha(0.85)
             this.layers.modal.setVisible(true)
@@ -47,6 +48,7 @@ class GameScene extends Phaser.Scene {
         }
         else {
             this.timers.levelTimer.paused = false
+            this.timers.newPieceTimer.paused = false
             this.layers.modal.destroy()
         }
     }
@@ -191,6 +193,7 @@ class GameScene extends Phaser.Scene {
         //     repeat: 0
         // });
         //
+
         // let greenPiece = this.add.sprite(unitX * 9 + 2, unitY * 1)
         //     .setScale(3)
         //     .setOrigin(0, 0)
@@ -209,6 +212,7 @@ class GameScene extends Phaser.Scene {
 
 
         this.initLevelTimer()
+        this.initNewPieceTimer()
     }
 
     fireMissile() {
@@ -323,6 +327,25 @@ class GameScene extends Phaser.Scene {
         // this.sprites.player.play("player-" + colors[this.spriteIndex])
     }
 
+    onPieceMove(piece, scene) {
+        let boardPos = piece.getBoardPos()
+        let newBoardPos = piece.getNewBoardPosition()
+
+        let screenPosX = scene.logicalToScreenX(boardPos.x)
+        let screenPosY = scene.logicalToScreenX(boardPos.y)
+        piece.sprite.setPosition(screenPosX, screenPosY)
+
+        let newScreenPosX = scene.logicalToScreenX(newBoardPos.x)
+        let newScreenPosY = scene.logicalToScreenX(newBoardPos.y)
+
+        scene.tweens.add({
+            targets: piece.sprite,
+            x: newScreenPosX,
+            y: newScreenPosY,
+            duration: 1000
+        });
+    }
+
     gameOver() {
         // this.sound.stopAll();
         this.scene.start('TitleScene');
@@ -348,6 +371,53 @@ class GameScene extends Phaser.Scene {
             callbackScope: this
         });
 
+    }
+
+    newPiece() {
+        let piece = globals.gameState.generateNextPiece()
+        console.log("New Piece: " + piece.type)
+
+        let animation = ""
+        switch (piece.type) {
+            case PieceType.GREEN:
+                animation = "piece-green"
+                break;
+            case PieceType.BLUE:
+                animation = "piece-blue"
+                break;
+            case PieceType.ORANGE:
+                animation = "piece-orange"
+                break;
+            case PieceType.PURPLE:
+                animation = "piece-purple"
+                break;
+        }
+
+        console.log("this.unitX: " + this.unitX)
+        console.log("this.piece.x: " + piece.x)
+        let sprite = this.add.sprite(this.unitX * piece.x + 2, this.unitY * piece.y)
+             .setScale(3)
+             .setOrigin(0, 0)
+             .play(animation)
+
+        console.log("Sprite pos: " + sprite.x + "," + sprite.y)
+        piece.sprite = sprite
+
+        this.layers.pieces.add(sprite)
+        console.log(sprite)
+
+    }
+
+    initNewPieceTimer() {
+        if (this.timers.newPieceTimer) {
+            this.timers.newPieceTimer.destroy()
+        }
+        this.timers.newPieceTimer = this.time.addEvent({
+            delay: globals.gameState.getNewPieceSeconds() * 1000,
+            callback: this.newPiece,
+            loop: true,
+            callbackScope: this
+        });
     }
 
     update() {

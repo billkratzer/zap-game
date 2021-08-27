@@ -1,3 +1,9 @@
+const GameEvent = {
+    PIECE_MOVE: "on-piece-move",
+    PIECE_EXPLODE: "on-piece-explode"
+}
+
+
 class GameState {
 
     constructor() {
@@ -5,7 +11,7 @@ class GameState {
         this.lives = 3
         this.score = 0
         this.level = 1
-        this.nextPieceType = null
+        this.nextPieceType = this.getRandomPieceType()
         this.paused = false
 
         this.BOARD_WIDTH = 20
@@ -39,6 +45,7 @@ class GameState {
     addNewPiece(scene, layer) {
         let type = this.getRandomPieceType()
         this.selectRandomGrid().addNewPiece(type, scene, layer)
+
     }
 
     selectRandomGrid() {
@@ -53,6 +60,21 @@ class GameState {
 
     getLevelSeconds() {
         return 60
+    }
+
+    on(event, callback, context) {
+        this.eventHandlers[event] = { callback: callback, context: context }
+    }
+
+    getNewPieceSeconds() {
+        return 5
+    }
+
+    commitMoves() {
+        for (var i = 0; i < this.grids.length; i++) {
+            let grid = grids[i]
+            grid.commitMoves()
+        }
     }
 
     fireMissile() {

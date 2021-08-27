@@ -21,6 +21,7 @@ class GamePiece {
         this.sprite = this.scene.add.sprite(0, 0, "sprites", 0).setScale(3).setOrigin(0.5, 0.5)
         this.sprite.play("piece-" + this.type + "-facing-" + this.direction)
         this.layer.add(this.sprite)
+
     }
 
     getType() {
