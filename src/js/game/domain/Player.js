@@ -80,14 +80,21 @@ class Player {
         this.scene = scene
     }
 
-    setSprite(sprite) {
-        this.sprite = sprite
+    buildSprite(scene, layer) {
+        this.scene = scene
+        this.layer = layer
 
-        this.sprite.setOrigin(0.5, 0.5)
+        this.sprite = this.scene.add.sprite(0, 0, "sprites", 0)
+            .setScale(3)
+            .setOrigin(0.5, 0.5)
+
         this.sprite.setPosition(
             globals.coords.boardXToScreenX(this.x),
             globals.coords.boardYToScreenY(this.y)
         )
+        this.sprite.play("player-" + this.color + "-" + this.direction)
+
+        this.layer.add(this.sprite)
     }
 
     changeColor(newColor) {

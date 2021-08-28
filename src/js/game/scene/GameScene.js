@@ -175,12 +175,7 @@ class GameScene extends Phaser.Scene {
         //     .play("player-blue")
 
         // Player Layer
-        let playerSprite = this.add.sprite(0, 0, "sprites", 0).setScale(3)
-        this.layers.player.add(playerSprite)
-
-        // wire the player sprite into the player object
-        globals.state.player.setScene(this)
-        globals.state.player.setSprite(playerSprite)
+        globals.state.player.buildSprite(this, this.layers.player)
 
         // Missile Layer
         globals.state.missile.buildSprite(this, this.layers.missile)
@@ -227,7 +222,8 @@ class GameScene extends Phaser.Scene {
         let state = globals.state
 
         // if we are already firing, do nothing
-        if (state.missile.moving) {
+        if (state.missile.firing) {
+            console.log("Alreading Firing!!!!!")
             return
         }
 
@@ -243,32 +239,6 @@ class GameScene extends Phaser.Scene {
             endPos.x,
             endPos.y
         )
-    }
-
-    missileFireBounce() {
-        let state = globals.state
-
-        let playerX = globals.coords.boardXToScreenX(state.player.x)
-        let playerY = globals.coords.boardYToScreenY(state.player.y)
-
-        console.log("missile fire bounce!")
-        this.tweens.add({
-            targets: this.sprites.player,
-            x: playerX,
-            y: playerY,
-            duration: 1000,
-            onComplete: this.missileFireEnd,
-            onCompleteScope: this
-        });
-
-    }
-
-    missileFireEnd() {
-        console.log("missile fire end!")
-
-        globals.state.firing = false;
-
-        this.updatePlayerSprite()
     }
 
     keyDown(code) {
@@ -472,6 +442,10 @@ class GameScene extends Phaser.Scene {
         // if the game is over (then there is nothing to update)
         if (this.counts.gameOver > 0) {
             return
+        }
+
+        if (globals.state.missile) {
+            console.log("### Missile.firing: " + globals.state.missile.firing)
         }
 
         this.updateInfo()

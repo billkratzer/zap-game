@@ -6,7 +6,7 @@ class Missile {
         this.y = -1
         this.direction = Direction.UP
 
-        this.moving = false
+        this.firing = false
     }
 
     buildSprite(scene, layer) {
@@ -14,12 +14,12 @@ class Missile {
         this.layer = layer
 
         this.rect = this.scene.add.rectangle(
-            10,
-            10,
-            50,
-            50,
+            0,
+            0,
+            0,
+            0,
             0x00ff00)
-            .setOrigin(0.5, 0.5)
+            .setOrigin(0, 0)
 
         this.layer.add(this.rect)
     }
@@ -27,11 +27,11 @@ class Missile {
     fire(fromX, fromY, toX, toY) {
         console.log("Firing missile from: " + fromX + "," + fromY + " to " + toX + "," + toY)
 
-        if (this.moving) {
+        if (this.firing) {
             return
         }
 
-        this.moving = true
+        this.firing = true
         let length = 0
         if (toX > fromX) {
             this.direction = Direction.RIGHT
@@ -56,48 +56,79 @@ class Missile {
 
         this.x = fromX
         this.y = fromY
-        this.rect.setPosition(
-            globals.coords.boardXToScreenX(fromX),
-            globals.coords.boardYToScreenY(fromY)
-        )
+
+        let fromScreenX = globals.coords.boardXToScreenX(fromX)
+        let fromScreenY = globals.coords.boardYToScreenY(fromY)
 
         let destWidth = 0
         let destHeight = 0
+
+        let bounceDestWidth = 0
+        let bounceDestHeight = 0
+
+        let toScreenX = fromScreenX
+        let toScreenY = fromScreenY
 
         switch (this.direction) {
             case Direction.UP:
                 console.log("computing up")
                 this.rect.width = globals.coords.boardXUnits(1)
                 this.rect.height = 0
-                this.rect.setOrigin(0.5, 1)
                 destWidth = globals.coords.boardXUnits(1)
                 destHeight = globals.coords.boardYUnits(length)
+                toScreenY = fromScreenY - destHeight
+
+                fromScreenX = fromScreenX - globals.coords.boardXUnits(0.5)
+                toScreenX = toScreenX - globals.coords.boardXUnits(0.5)
+
+                bounceDestWidth = destWidth
+                bounceDestHeight = 0
                 break;
             case Direction.DOWN:
                 console.log("computing down")
                 this.rect.width = globals.coords.boardXUnits(1)
                 this.rect.height = 0
-                this.rect.setOrigin(0.5, 0)
                 destWidth = globals.coords.boardXUnits(1)
                 destHeight = globals.coords.boardYUnits(length)
+
+                fromScreenX = fromScreenX - globals.coords.boardXUnits(0.5)
+                toScreenX = toScreenX - globals.coords.boardXUnits(0.5)
+
+                bounceDestWidth = destWidth
+                bounceDestHeight = 0
                 break;
             case Direction.LEFT:
                 console.log("computing left")
                 this.rect.width = 0
                 this.rect.height = globals.coords.boardYUnits(1)
-                this.rect.setOrigin(1, 0.5)
                 destWidth = globals.coords.boardXUnits(length)
                 destHeight = globals.coords.boardYUnits(1)
+                toScreenX = fromScreenX - destWidth
+
+                fromScreenY = fromScreenY - globals.coords.boardYUnits(0.5)
+                toScreenY = toScreenY - globals.coords.boardYUnits(0.5)
+
+                bounceDestWidth = 0
+                bounceDestHeight = destHeight
                 break;
             case Direction.RIGHT:
                 console.log("computing right")
                 this.rect.width = 0
                 this.rect.height = globals.coords.boardYUnits(1)
-                this.rect.setOrigin(0, 0.5)
                 destWidth = globals.coords.boardXUnits(length)
                 destHeight = globals.coords.boardYUnits(1)
+
+                fromScreenY = fromScreenY - globals.coords.boardYUnits(0.5)
+                toScreenY = toScreenY - globals.coords.boardYUnits(0.5)
+
+                bounceDestWidth = 0
+                bounceDestHeight = destHeight
                 break;
         }
+
+        let bounceToScreenX = fromScreenX
+        let bounceToScreenY = fromScreenY
+
 
         console.log("Before tween x:", this.rect.x)
         console.log("Before tween y:", this.rect.y)
@@ -111,45 +142,54 @@ class Missile {
         console.log("Tween width: " + destWidth)
         console.log("Tween height: " + destHeight)
 
+        this.rect.setOrigin(0, 0)
+        this.rect.setPosition(fromScreenX, fromScreenY)
+
         this.scene.tweens.add({
             targets: this.rect,
-            x: globals.coords.boardXToScreenX(fromX) + 0,
-            y: globals.coords.boardXToScreenX(fromY) - destHeight,
-            originX: 0.5,
-            originY: 1,
+            x: toScreenX,
+            y: toScreenY,
             width: destWidth,
             height: destHeight,
             duration: 1000,
             onComplete: this.bounce,
+            onCompleteScope: this,
+            onCompleteParams: [
+                bounceToScreenX,
+                bounceToScreenY,
+                bounceDestWidth,
+                bounceDestHeight
+            ]
         })
 
-        // this.tweens.add({
-        //     targets: this.sprites.player,
-        //     x: endX,
-        //     y: endY,
-        //     duration: 1000,
-        //     onComplete: this.missileFireBounce,
-        //     onCompleteScope: this
-        // });
-
-        // this.scene.tweens.add({
-        //     targets: this.sprite,
-        //     x: globals.coords.boardXToScreenX(this.x),
-        //     y: globals.coords.boardYToScreenY(this.y),
-        //     duration: 100,
-        //     delay: 0,
-        //     onComplete: this.endMoveSprite,
-        //     onCompleteScope: this
-        // })
     }
 
-    bounce() {
-        this.moving = false
+    bounce(tween, target, destX, destY, destWidth, destHeight) {
+        console.log("bounce: " + destX + "," + destY + "," + destWidth + "," + destHeight)
+
+        this.scene.tweens.add({
+            targets: this.rect,
+            x: destX,
+            y: destY,
+            width: destWidth,
+            height: destHeight,
+            duration: 1000,
+            onComplete: this.endFire,
+            onCompleteScope: this
+        })
+
     }
 
-    endMoveSprite() {
-        // this.sprite.play("player-" + this.color + "-" + this.direction)
-        // this.moving = false
+    endFire() {
+        console.log("End fire!!!!")
+        console.log("@@@ This.firing:" + this.firing)
+        this.firing = false
+        console.log("@@@ Globals.state.firing: " + globals.state.missile.firing)
+
+        if (this.rect) {
+            this.rect.width = 0
+            this.rect.height = 0
+        }
     }
 
     setPosition(x , y) {

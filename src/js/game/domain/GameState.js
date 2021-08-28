@@ -26,8 +26,6 @@ class GameState {
 
         this.grids.push(this.leftGrid, this.rightGrid, this.topGrid, this.bottomGrid)
 
-        this.firing = false
-
         this.playerBounds = {
             minX: 8,
             maxX: 11,
