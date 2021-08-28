@@ -36,6 +36,7 @@ class GameState {
         }
 
         this.player = new Player(PlayerColor.GREEN, this.playerBounds)
+        this.missile = new Missile()
     }
 
     togglePaused() {
@@ -101,25 +102,25 @@ class GameState {
         let grid = null
 
         switch (this.player.direction) {
-            case PlayerDirection.UP:
+            case Direction.UP:
                 grid = this.topGrid
                 gx = this.player.x - 8
                 gy = grid.height - 1
                 dy = -1
                 break;
-            case PlayerDirection.DOWN:
+            case Direction.DOWN:
                 grid = this.bottomGrid
                 gx = this.player.x - 8
                 gy = 0
                 dy = 1
                 break;
-            case PlayerDirection.LEFT:
+            case Direction.LEFT:
                 grid = this.leftGrid
                 gx = grid.width - 1
                 gy = this.player.y - 5
                 dx = -1
                 break;
-            case PlayerDirection.RIGHT:
+            case Direction.RIGHT:
                 grid = this.rightGrid
                 gx = 0
                 gy = this.player.y - 5
@@ -128,12 +129,15 @@ class GameState {
         }
 
         let done = false
+
+        this.firing.explodingPieces = []
+
         while (!done) {
             if ( grid.inBounds(gx, gy) ) {
                 let piece = grid.getPieceAt(gx, gy)
                 if (piece) {
                     if (piece.type === this.player.color) {
-                        piece.exploding = true
+                        this.firing.explodingPieces.push(piece)
                     }
                     else {
                         this.firing.newColor = piece.type
@@ -153,16 +157,16 @@ class GameState {
 
         // mx and mx represent the final state of the bullet
         switch (this.player.direction) {
-            case PlayerDirection.UP:
+            case Direction.UP:
                 my = gy
                 break;
-            case PlayerDirection.DOWN:
+            case Direction.DOWN:
                 my = gy + 9
                 break;
-            case PlayerDirection.LEFT:
+            case Direction.LEFT:
                 mx = gx
                 break;
-            case PlayerDirection.RIGHT:
+            case Direction.RIGHT:
                 mx = gx + 12
                 break;
         }

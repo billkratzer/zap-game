@@ -72,7 +72,8 @@ class GameScene extends Phaser.Scene {
         this.layers.dots = this.add.layer().setDepth(1)
         this.layers.player = this.add.layer().setDepth(2)
         this.layers.pieces = this.add.layer().setDepth(3)
-        this.layers.info = this.add.layer().setDepth(4)
+        this.layers.missile = this.add.layer().setDepth(4)
+        this.layers.info = this.add.layer().setDepth(10)
 
 
         // Info Layer
@@ -181,6 +182,8 @@ class GameScene extends Phaser.Scene {
         globals.state.player.setScene(this)
         globals.state.player.setSprite(playerSprite)
 
+        // Missile Layer
+        globals.state.missile.buildSprite(this, this.layers.missile)
         //this.spriteIndex = 0
 
         // Piece Layer
@@ -224,36 +227,22 @@ class GameScene extends Phaser.Scene {
         let state = globals.state
 
         // if we are already firing, do nothing
-        if (state.firing) {
+        if (state.missile.moving) {
             return
         }
 
         // fire the missile and compute it's end point
         state.fireMissile()
 
+
         // get the end state
         let endPos = state.firing.endPos
-
-        let startX = globals.coords.boardXToScreenX(state.player.x)
-        let startY = globals.coords.boardYToScreenY(state.player.y)
-
-        let endX = globals.coords.boardXToScreenX(endPos.x)
-        let endY = globals.coords.boardYToScreenY(endPos.y)
-
-        console.log("Player Pos: " + state.player.x + "," + state.player.y)
-        console.log("End Pos: " + endPos.x + "," + endPos.y)
-        console.log("Start: " + startX + "," + startY)
-        console.log("End: " + endX + "," + endY)
-
-        this.tweens.add({
-            targets: this.sprites.player,
-            x: endX,
-            y: endY,
-            duration: 1000,
-            onComplete: this.missileFireBounce,
-            onCompleteScope: this
-        });
-
+        state.missile.fire(
+            state.player.x,
+            state.player.y,
+            endPos.x,
+            endPos.y
+        )
     }
 
     missileFireBounce() {

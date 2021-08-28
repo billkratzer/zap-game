@@ -20,6 +20,17 @@ class AnimationFactory {
         this.buildPlayerAnimationsForColor(PieceType.BLUE, 0 + 4)
         this.buildPlayerAnimationsForColor(PieceType.ORANGE, 0 + 4 * 2)
         this.buildPlayerAnimationsForColor(PieceType.PURPLE, 0 + 4 * 3)
+
+        this.buildExplosion()
+    }
+
+    buildExplosion() {
+        this.scene.anims.create({
+            key: "explosion",
+            frames: this.scene.anims.generateFrameNumbers('sprites', { frames: this.range(8 * 18, 4) }),
+            frameRate: 8,
+            repeat: 0
+        });
     }
 
     buildPlayerAnimationsForColor(color, offset) {
