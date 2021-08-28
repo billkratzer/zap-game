@@ -70,11 +70,16 @@ class GameState {
         return 5
     }
 
-    commitMoves() {
-        for (var i = 0; i < this.grids.length; i++) {
-            let grid = grids[i]
-            grid.commitMoves()
-        }
+    isGameOver() {
+        let over = false
+        this.grids.forEach(
+            grid => {
+                if (grid.overflow) {
+                    over = true
+                }
+            }
+        )
+        return over
     }
 
     fireMissile() {
@@ -97,28 +102,24 @@ class GameState {
 
         switch (this.player.direction) {
             case PlayerDirection.UP:
-                console.log("Checking top grid")
                 grid = this.topGrid
                 gx = this.player.x - 8
                 gy = grid.height - 1
                 dy = -1
                 break;
             case PlayerDirection.DOWN:
-                console.log("Checking bottom grid")
                 grid = this.bottomGrid
                 gx = this.player.x - 8
                 gy = 0
                 dy = 1
                 break;
             case PlayerDirection.LEFT:
-                console.log("Checking left grid")
                 grid = this.leftGrid
                 gx = grid.width - 1
                 gy = this.player.y - 5
                 dx = -1
                 break;
             case PlayerDirection.RIGHT:
-                console.log("Checking right grid")
                 grid = this.rightGrid
                 gx = 0
                 gy = this.player.y - 5
@@ -128,17 +129,13 @@ class GameState {
 
         let done = false
         while (!done) {
-            console.log("checking at: " + gx + "," + gy);
             if ( grid.inBounds(gx, gy) ) {
                 let piece = grid.getPieceAt(gx, gy)
-                console.log("Grid piece at: " + gx + "," + gy + ": " + piece )
                 if (piece) {
                     if (piece.type === this.player.color) {
-                        console.log("Found color match of " + piece.type + " at: " + gx + "," + gy)
                         piece.exploding = true
                     }
                     else {
-                        console.log("Bouncing back with color of " + piece.type + " at: " + gx + "," + gy)
                         this.firing.newColor = piece.type
                         done = true
 
@@ -150,14 +147,11 @@ class GameState {
                 }
             }
             else {
-                console.log("Out of bounds");
                 done = true
             }
         }
 
         // mx and mx represent the final state of the bullet
-        console.log("Done: mx = " + mx + ", my = " + my)
-        console.log("Done: gx = " + gx + ", gy = " + gy)
         switch (this.player.direction) {
             case PlayerDirection.UP:
                 my = gy
@@ -172,7 +166,6 @@ class GameState {
                 mx = gx + 12
                 break;
         }
-        console.log("Done: mx = " + mx + ", my = " + my)
         this.firing.endPos = {
             x: mx,
             y: my

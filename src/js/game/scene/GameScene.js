@@ -9,11 +9,15 @@ class GameScene extends Phaser.Scene {
         this.sprites = {}
         this.shapes = {}
         this.timers = {}
+
+        this.counts = {}
     }
 
     preload () {
         globals.state = new GameState()
         globals.animationFactory = new AnimationFactory(this)
+
+        this.counts.gameOver = 0
     }
 
 
@@ -50,6 +54,7 @@ class GameScene extends Phaser.Scene {
             this.timers.levelTimer.paused = false
             this.timers.newPieceTimer.paused = false
             this.layers.modal.destroy()
+            this.layers.modal = null
         }
     }
 
@@ -293,6 +298,19 @@ class GameScene extends Phaser.Scene {
             return;
         }
 
+
+        if (globals.state.isGameOver()) {
+            switch (code) {
+                case "Escape":
+                    this.scene.start('TitleScene');
+                    break;
+                case "Space":
+                    this.scene.start('TitleScene');
+                    break;
+            }
+            return
+        }
+
         switch (code) {
             case "ArrowLeft":
                 globals.state.player.move(Direction.LEFT, -1, 0)
@@ -316,15 +334,10 @@ class GameScene extends Phaser.Scene {
     }
 
     click(pointer, localX, localY, event) {
+        if (this.counts.gameOver > 0) {
+            return
+        }
         globals.state.addNewPiece(this, this.layers.pieces)
-        //this.layers.bottom.setVisible(!this.layers.bottom.visible)
-
-        // this.spriteIndex++
-        // if (this.spriteIndex >= 4) {
-        //     this.spriteIndex = 0
-        // }
-        // let colors = ["blue", "purple", "green", "orange"]
-        // this.sprites.player.play("player-" + colors[this.spriteIndex])
     }
 
     onPieceMove(piece, scene) {
@@ -347,8 +360,28 @@ class GameScene extends Phaser.Scene {
     }
 
     gameOver() {
-        // this.sound.stopAll();
-        this.scene.start('TitleScene');
+        this.layers.modal = this.add.layer().setDepth(1000)
+        this.layers.modal.setAlpha(0.85)
+        this.layers.modal.setVisible(true)
+
+        let camera = this.cameras.main
+        let width = camera.width
+        let height = camera.height
+
+        let rect = this.add.rectangle(width / 2, height / 2, width *.60, height * .40, 0x000000)
+            .setOrigin(0.5, 0.5)
+
+        let text1 = this.add.bitmapText(width / 2, height * 0.40, 'game-font', 'Game Paused', 36)
+            .setOrigin(0.5, 0.5)
+
+        let text2 = this.add.bitmapText(width / 2, height * 0.55, 'game-font', 'Press [Esc] to resume', 24)
+            .setOrigin(0.5, 0.5)
+
+        let text3 = this.add.bitmapText(width / 2, height * 0.62, 'game-font', 'Press [q] to quit', 24)
+            .setOrigin(0.5, 0.5)
+
+        this.layers.modal.add([rect, text1, text2, text3])
+
     }
 
     updateInfo() {
@@ -412,16 +445,54 @@ class GameScene extends Phaser.Scene {
         if (this.timers.newPieceTimer) {
             this.timers.newPieceTimer.destroy()
         }
-        this.timers.newPieceTimer = this.time.addEvent({
-            delay: globals.gameState.getNewPieceSeconds() * 1000,
-            callback: this.newPiece,
-            loop: true,
-            callbackScope: this
-        });
+        // this.timers.newPieceTimer = this.time.addEvent({
+        //     delay: globals.gameState.getNewPieceSeconds() * 1000,
+        //     callback: this.newPiece,
+        //     loop: true,
+        //     callbackScope: this
+        // });
+    }
+
+    gameOver() {
+        this.layers.gameOver = this.add.layer().setDepth(2000)
+        this.layers.gameOver.setVisible(true)
+
+        let camera = this.cameras.main
+        let width = camera.width
+        let height = camera.height
+
+        let rect = this.add.rectangle(
+            0,
+            0,
+            globals.coords.screenWidth,
+            globals.coords.screenHeight,
+            0x000000)
+            .setOrigin(0, 0)
+            .setAlpha(0.85)
+
+        let text1 = this.add.bitmapText(width / 2, height * 0.40, 'game-over-font', 'GAME OVER', 96)
+            .setOrigin(0.5, 0.5)
+
+        let text2 = this.add.bitmapText(width / 2, height * 0.55, 'game-font', 'Press [Space] to quit', 24)
+            .setOrigin(0.5, 0.5)
+
+        this.layers.gameOver.add([rect, text1, text2])
     }
 
     update() {
+        // if the game is over (then there is nothing to update)
+        if (this.counts.gameOver > 0) {
+            return
+        }
+
         this.updateInfo()
+
+        if (globals.state.isGameOver()) {
+            if (this.counts.gameOver == 0) {
+                this.gameOver()
+            }
+            this.counts.gameOver++
+        }
     }
 
 }

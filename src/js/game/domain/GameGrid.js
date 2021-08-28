@@ -140,77 +140,45 @@ class GameGrid {
 
         let newPiece = new GamePiece(type, facing, this, scene, layer)
         newPiece.setPosition(x, y)
-        newPiece.animateIn()
+        newPiece.fadeIn()
 
-        var done = false
+        let movingPieces = []
+
+        let done = false
         while ( !done ) {
-            var piece = this.getPieceAt(x, y)
+            let piece = this.getPieceAt(x, y)
+            this.setPieceAt(x, y, null)
             if ( piece ) {
                 x = x + shiftX
                 y = y + shiftY
-                piece.setNewPosition(x, y)
+                piece.moveToPosition(x, y, facing)
+                movingPieces.push(piece)
             }
             else {
                 done = true
             }
             if (( x < 0 ) || ( x >= this.width )) {
+                this.overflow = true
                 done = true
             }
             if (( y < 0 ) || ( y >= this.height )) {
+                this.overflow = true
                 done = true
             }
-
         }
+        if (this.overflow) {
+            return
+        }
+
+        for (var i = 0; i < movingPieces.length; i++) {
+            let piece = movingPieces[i]
+            this.setPieceAt(piece.x, piece.y, piece)
+        }
+
+        this.setPieceAt(newPiece.x, newPiece.y, newPiece)
 
         return newPiece
     }
 
-    getMovingPieces() {
-        let moving = []
-
-        for (let x = 0; x < this.width; x++) {
-            for (let y = 0; y < this.height; y++) {
-                let piece = this.getPieceAt(x, y)
-                if ( piece && piece.isMoving() ) {
-                    moving.push(piece)
-                }
-            }
-        }
-
-        return moving
-    }
-
-    commitMoves() {
-        let movingPieces = []
-
-        for (let x = 0; x <this.width; x++) {
-            for (let y = 0; y < this.height; y++) {
-                let piece = this.getPieceAt(x, y)
-                if ( piece && piece.isMoving() ) {
-                    movingPieces.push(piece)
-                    this.setPieceAt(x, y, null)
-                }
-            }
-        }
-
-        for (let i = 0; i < movingPieces.length; i++ ) {
-            movingPieces[i].moveToNewPosition()
-            let pos = movingPieces[i].getPosition()
-            this.setPieceAt(pos.x, pos.y, savedPieces[i])
-
-            if ((pos.x < 0) || (pos.x >= width)) {
-                this.overflow = true
-            }
-            if ((pos.y < 0) || (pos.y >= height)) {
-                this.overflow = true
-            }
-        }
-
-        this.newPiece.moveToNewPosition()
-        let pos = this.newPiece.getPosition()
-        this.setPieceAt(pos.x, pos.y, this.newPiece)
-
-        this.newPiece = null
-    }
 
 }
