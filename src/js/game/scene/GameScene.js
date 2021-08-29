@@ -95,7 +95,7 @@ class GameScene extends Phaser.Scene {
 
         this.texts.time = this.add.bitmapText(
             globals.coords.screenWidth - 10,
-            globals.coords.screenJeight - 10,
+            globals.coords.screenHeight - 10,
             'game-font',
             'Time: ',
             32)
@@ -321,7 +321,7 @@ class GameScene extends Phaser.Scene {
         });
     }
 
-    gameOver() {
+    pause() {
         this.layers.modal = this.add.layer().setDepth(1000)
         this.layers.modal.setAlpha(0.85)
         this.layers.modal.setVisible(true)
