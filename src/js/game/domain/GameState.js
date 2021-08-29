@@ -78,11 +78,11 @@ class GameState {
     }
 
     calcPoints(streak) {
-        return streak * 10
+        return streak * 100
     }
 
     addScore(points) {
-        this.score = this.score + 10 * points
+        this.score = this.score + points
     }
 
     isGameOver() {
