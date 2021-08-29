@@ -152,7 +152,7 @@ class Missile {
         this.rect.setPosition(fromScreenX, fromScreenY)
         this.rect.fillColor = this.toHexColor(startColor)
 
-        const TWEEN_MILLIS = 200
+        const TWEEN_MILLIS = 100
         this.scene.tweens.add({
             targets: this.rect,
             x: toScreenX,
@@ -220,7 +220,7 @@ class Missile {
             y: destY,
             width: destWidth,
             height: destHeight,
-            duration: 200,
+            duration: 100,
             onComplete: this.endFire,
             onCompleteScope: this,
             onCompleteParams: [
