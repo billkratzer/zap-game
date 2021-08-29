@@ -81,8 +81,8 @@ class GameScene extends Phaser.Scene {
             0 + 10,
             0,
             'game-font',
-            'Score: ',
-            32)
+            ' ',
+            64)
             .setOrigin(0, 0)
 
         this.texts.level = this.add.bitmapText(
@@ -90,7 +90,7 @@ class GameScene extends Phaser.Scene {
             0,
             'game-font',
             'Level: ',
-            32)
+            64)
             .setOrigin(1, 0)
 
         this.texts.time = this.add.bitmapText(
@@ -98,7 +98,7 @@ class GameScene extends Phaser.Scene {
             globals.coords.screenHeight - 10,
             'game-font',
             'Time: ',
-            32)
+            64)
             .setOrigin(1, 1)
 
         this.layers.info.add([this.texts.score, this.texts.level, this.texts.time])
@@ -291,11 +291,11 @@ class GameScene extends Phaser.Scene {
     }
 
     updateInfo() {
-        this.texts.score.setText("Score : " + globals.state.score)
-        this.texts.level.setText("Level : " + globals.state.level)
+        this.texts.score.setText("" + globals.state.score)
+        this.texts.level.setText("Level: " + globals.state.level)
 
         if (this.timers.levelTimer) {
-            this.texts.time.setText("Time : " + Math.ceil(this.timers.levelTimer.getRemainingSeconds()))
+            this.texts.time.setText("" + Math.ceil(this.timers.levelTimer.getRemainingSeconds()))
         }
     }
 
