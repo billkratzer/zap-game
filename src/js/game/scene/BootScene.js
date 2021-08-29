@@ -24,6 +24,7 @@ class BootScene extends Phaser.Scene {
     }
 
     preload () {
+        this.loadFont("points-font")
         this.loadFont("game-font")
         this.loadFont("game-over-font")
         this.loadFont("helvetica-neue-white-32")

@@ -86,7 +86,10 @@ class GamePiece {
             callbackScope: this,
         })
 
-        globals.state.addScore(points)
+        let boardPos = this.grid.fromGridPosToBoardPos(this.x, this.y)
+        let pts = new Points(points, boardPos.x, boardPos.y)
+        pts.buildSprite(this.scene, this.layer)
+        pts.flyHome()
     }
 
     startFade() {
