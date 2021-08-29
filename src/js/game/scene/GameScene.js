@@ -141,68 +141,11 @@ class GameScene extends Phaser.Scene {
         }
 
         // Player Layer
-        // Animation set
-        // this.anims.create({
-        //     key: "player-green",
-        //     frames: this.anims.generateFrameNumbers('sprites', { frames: [ 0, 1, 2, 3 ] }),
-        //     frameRate: 8,
-        //     repeat: -1
-        // });
-        //
-        // this.anims.create({
-        //     key: "player-blue",
-        //     frames: this.anims.generateFrameNumbers('sprites', { frames: [ 4, 5, 6, 7 ] }),
-        //     frameRate: 1,
-        //     repeat: -1
-        // });
-        //
-        // this.anims.create({
-        //     key: "player-orange",
-        //     frames: this.anims.generateFrameNumbers('sprites', { frames: [ 8, 9, 10, 11 ] }),
-        //     frameRate: 8,
-        //     repeat: -1
-        // });
-        //
-        // this.anims.create({
-        //     key: "player-purple",
-        //     frames: this.anims.generateFrameNumbers('sprites', { frames: [ 12, 13, 14, 15 ] }),
-        //     frameRate: 8,
-        //     repeat: -1
-        // });
-
-        // this.sprites.player = this.add.sprite(unitX * 9, unitY * 9)
-        //     .setScale(3)
-        //     .play("player-blue")
-
-        // Player Layer
         globals.state.player.buildSprite(this, this.layers.player)
 
         // Missile Layer
         globals.state.missile.buildSprite(this, this.layers.missile)
-        //this.spriteIndex = 0
 
-        // Piece Layer
-        // Animation set
-        // this.anims.create({
-        //     key: "piece-green-down",
-        //     frames: this.anims.generateFrameNumbers('sprites', { frames: [ 16, 17, 18, 19 ] }),
-        //     frameRate: 1,
-        //     repeat: -1
-        // });
-        //
-        // this.anims.create({
-        //     key: "piece-green",
-        //     frames: this.anims.generateFrameNumbers('sprites', { frames: [ 16 ] }),
-        //     repeat: 0
-        // });
-        //
-
-        // let greenPiece = this.add.sprite(unitX * 9 + 2, unitY * 1)
-        //     .setScale(3)
-        //     .setOrigin(0, 0)
-        //     .play("piece-green")
-        //
-        // this.layers.pieces.add(greenPiece)
 
         // Events
 
@@ -244,6 +187,7 @@ class GameScene extends Phaser.Scene {
     }
 
     keyDown(code) {
+        console.log(code)
         if (globals.state.isGameOver()) {
             switch (code) {
                 case "Escape":
@@ -283,8 +227,10 @@ class GameScene extends Phaser.Scene {
             case "ArrowDown":
                 globals.state.player.move(Direction.DOWN, 0, 1)
                 break
+            case "Backspace":
+                globals.state.addNewPiece(this, this.layers.pieces)
+                break
             case "Space":
-                console.log("Space")
                 this.fireMissile()
                 break
             case "Escape":
@@ -419,10 +365,6 @@ class GameScene extends Phaser.Scene {
         // if the game is over (then there is nothing to update)
         if (this.counts.gameOver > 0) {
             return
-        }
-
-        if (globals.state.missile) {
-            console.log("### Missile.firing: " + globals.state.missile.firing)
         }
 
         this.updateInfo()
