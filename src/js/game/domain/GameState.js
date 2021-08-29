@@ -58,7 +58,7 @@ class GameState {
     }
 
     getLevelSeconds() {
-        return 60
+        return 10
     }
 
     on(event, callback, context) {
@@ -66,7 +66,15 @@ class GameState {
     }
 
     getNewPieceSeconds() {
-        return 5
+        let secondsByLevel = [5, 4, 3, 2, 1, 0.5, 0.25]
+
+        let index = this.level - 1
+        if (index < secondsByLevel.length) {
+            return secondsByLevel[index]
+        }
+        else {
+            return secondsByLevel[secondsByLevel.length - 1]
+        }
     }
 
     isGameOver() {
@@ -79,6 +87,10 @@ class GameState {
             }
         )
         return over
+    }
+
+    levelUp() {
+        this.level++
     }
 
     fireMissile() {

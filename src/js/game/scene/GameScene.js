@@ -244,7 +244,18 @@ class GameScene extends Phaser.Scene {
     }
 
     keyDown(code) {
-        console.log("Key Down: " + code)
+        if (globals.state.isGameOver()) {
+            switch (code) {
+                case "Escape":
+                    this.scene.start('TitleScene');
+                    break;
+                case "Space":
+                    this.scene.start('TitleScene');
+                    break;
+            }
+            return
+        }
+
         if (globals.state.paused) {
             switch (code) {
                 case "Escape":
@@ -257,19 +268,6 @@ class GameScene extends Phaser.Scene {
                     break;
             }
             return;
-        }
-
-
-        if (globals.state.isGameOver()) {
-            switch (code) {
-                case "Escape":
-                    this.scene.start('TitleScene');
-                    break;
-                case "Space":
-                    this.scene.start('TitleScene');
-                    break;
-            }
-            return
         }
 
         switch (code) {
@@ -351,7 +349,7 @@ class GameScene extends Phaser.Scene {
         this.texts.level.setText("Level : " + globals.state.level)
 
         if (this.timers.levelTimer) {
-            this.texts.time.setText("Time : " + Math.floor(this.timers.levelTimer.getRemainingSeconds()))
+            this.texts.time.setText("Time : " + Math.ceil(this.timers.levelTimer.getRemainingSeconds()))
         }
     }
 
@@ -362,10 +360,17 @@ class GameScene extends Phaser.Scene {
         }
         this.timers.levelTimer = this.time.addEvent({
             delay: globals.state.getLevelSeconds() * 1000,
-            callback: this.gameOver,
+            callback: this.onLevelTimerEnd,
             callbackScope: this
         });
 
+    }
+
+    onLevelTimerEnd() {
+        globals.state.levelUp()
+
+        this.initNewPieceTimer()
+        this.initLevelTimer()
     }
 
     newPiece() {
