@@ -80,6 +80,12 @@ class GamePiece {
     explode(points) {
         this.exploding = true
         this.sprite.play("explosion")
+        this.scene.tweens.add({
+            targets: this.sprite,
+            scale: 0.5,
+            duration: 500,
+        })
+
         this.scene.time.addEvent({
             delay: 200,
             callback: this.startFade,
