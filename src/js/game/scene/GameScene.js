@@ -2,7 +2,6 @@ class GameScene extends Phaser.Scene {
 
 
     constructor () {
-        console.log("hello")
         super({ key: 'GameScene' });
 
         this.layers = {}
