@@ -212,8 +212,6 @@ class Missile {
     }
 
     bounce(tween, target, destX, destY, destWidth, destHeight, newColor) {
-        console.log("bounce: " + destX + "," + destY + "," + destWidth + "," + destHeight)
-
         this.rect.fillColor = this.toHexColor(newColor)
 
         this.scene.tweens.add({
