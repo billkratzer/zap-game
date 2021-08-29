@@ -77,6 +77,14 @@ class GameState {
         }
     }
 
+    calcPoints(streak) {
+        return streak * 10
+    }
+
+    addScore(points) {
+        this.score = this.score + 10 * points
+    }
+
     isGameOver() {
         let over = false
         this.grids.forEach(

@@ -180,6 +180,7 @@ class Missile {
         let totalDistance = Math.sqrt(diffX * diffX + diffY * diffY)
 
         // Compute when to explode the pieces
+        let streak = 1
         for (var i = 0; i < explodingPieces.length; i++) {
             let piece = explodingPieces[i]
 
@@ -193,7 +194,9 @@ class Missile {
                 delay: delayMillis,
                 callback: piece.explode,
                 callbackScope: piece,
+                args: [ globals.state.calcPoints(streak) ]
             })
+            streak++
         }
 
         // Is there a piece that should change color?

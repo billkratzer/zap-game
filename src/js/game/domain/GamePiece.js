@@ -77,7 +77,7 @@ class GamePiece {
         })
     }
 
-    explode() {
+    explode(points) {
         this.exploding = true
         this.sprite.play("explosion")
         this.scene.time.addEvent({
@@ -86,6 +86,7 @@ class GamePiece {
             callbackScope: this,
         })
 
+        globals.state.addScore(points)
     }
 
     startFade() {
