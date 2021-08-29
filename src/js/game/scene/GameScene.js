@@ -2,6 +2,7 @@ class GameScene extends Phaser.Scene {
 
 
     constructor () {
+        console.log("hello")
         super({ key: 'GameScene' });
 
         this.layers = {}
@@ -70,9 +71,9 @@ class GameScene extends Phaser.Scene {
 
         this.layers.bottom = this.add.layer().setDepth(0)
         this.layers.dots = this.add.layer().setDepth(1)
-        this.layers.player = this.add.layer().setDepth(2)
-        this.layers.pieces = this.add.layer().setDepth(3)
-        this.layers.missile = this.add.layer().setDepth(4)
+        this.layers.missile = this.add.layer().setDepth(2)
+        this.layers.player = this.add.layer().setDepth(3)
+        this.layers.pieces = this.add.layer().setDepth(4)
         this.layers.info = this.add.layer().setDepth(10)
 
 
@@ -223,21 +224,23 @@ class GameScene extends Phaser.Scene {
 
         // if we are already firing, do nothing
         if (state.missile.firing) {
-            console.log("Alreading Firing!!!!!")
+            console.log("Already Firing!!!!!")
             return
         }
 
         // fire the missile and compute it's end point
-        state.fireMissile()
-
+        let firingInfo = state.fireMissile()
 
         // get the end state
-        let endPos = state.firing.endPos
         state.missile.fire(
             state.player.x,
             state.player.y,
-            endPos.x,
-            endPos.y
+            firingInfo.endPos.x,
+            firingInfo.endPos.y,
+            firingInfo.startColor,
+            firingInfo.endColor,
+            firingInfo.explodingPieces,
+            firingInfo.pieceToChange
         )
     }
 
@@ -284,6 +287,7 @@ class GameScene extends Phaser.Scene {
                 globals.state.player.move(Direction.DOWN, 0, 1)
                 break
             case "Space":
+                console.log("Space")
                 this.fireMissile()
                 break
             case "Escape":
@@ -366,50 +370,19 @@ class GameScene extends Phaser.Scene {
     }
 
     newPiece() {
-        let piece = globals.gameState.generateNextPiece()
-        console.log("New Piece: " + piece.type)
-
-        let animation = ""
-        switch (piece.type) {
-            case PieceType.GREEN:
-                animation = "piece-green"
-                break;
-            case PieceType.BLUE:
-                animation = "piece-blue"
-                break;
-            case PieceType.ORANGE:
-                animation = "piece-orange"
-                break;
-            case PieceType.PURPLE:
-                animation = "piece-purple"
-                break;
-        }
-
-        console.log("this.unitX: " + this.unitX)
-        console.log("this.piece.x: " + piece.x)
-        let sprite = this.add.sprite(this.unitX * piece.x + 2, this.unitY * piece.y)
-             .setScale(3)
-             .setOrigin(0, 0)
-             .play(animation)
-
-        console.log("Sprite pos: " + sprite.x + "," + sprite.y)
-        piece.sprite = sprite
-
-        this.layers.pieces.add(sprite)
-        console.log(sprite)
-
+        globals.state.addNewPiece(this, this.layers.pieces)
     }
 
     initNewPieceTimer() {
         if (this.timers.newPieceTimer) {
             this.timers.newPieceTimer.destroy()
         }
-        // this.timers.newPieceTimer = this.time.addEvent({
-        //     delay: globals.gameState.getNewPieceSeconds() * 1000,
-        //     callback: this.newPiece,
-        //     loop: true,
-        //     callbackScope: this
-        // });
+        this.timers.newPieceTimer = this.time.addEvent({
+            delay: globals.state.getNewPieceSeconds() * 1000,
+            callback: this.newPiece,
+            loop: true,
+            callbackScope: this
+        });
     }
 
     gameOver() {

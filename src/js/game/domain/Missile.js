@@ -20,12 +20,35 @@ class Missile {
             0,
             0x00ff00)
             .setOrigin(0, 0)
+            .setAlpha(0.50)
 
         this.layer.add(this.rect)
     }
 
-    fire(fromX, fromY, toX, toY) {
-        console.log("Firing missile from: " + fromX + "," + fromY + " to " + toX + "," + toY)
+    toHexColor(color) {
+        switch (color) {
+            case PlayerColor.GREEN: {
+                return 0x00ff00
+                break
+            }
+            case PlayerColor.BLUE: {
+                return 0x0000ff
+                break
+            }
+            case PlayerColor.PURPLE: {
+                return 0x800080
+                break
+            }
+            case PlayerColor.ORANGE: {
+                return 0xffa500
+                break
+            }
+        }
+        return 0xffffff
+    }
+
+    fire(fromX, fromY, toX, toY, startColor, endColor, explodingPieces, pieceToChange) {
+        // console.log("Firing missile from: " + fromX + "," + fromY + " to " + toX + "," + toY)
 
         if (this.firing) {
             return
@@ -52,7 +75,6 @@ class Missile {
         else {
             throw new Error("Unable to determine missile direction")
         }
-        console.log("Missile is firing: " + this.direction)
 
         this.x = fromX
         this.y = fromY
@@ -71,55 +93,51 @@ class Missile {
 
         switch (this.direction) {
             case Direction.UP:
-                console.log("computing up")
-                this.rect.width = globals.coords.boardXUnits(1)
+                this.rect.width = globals.coords.boardXUnits(0.5)
                 this.rect.height = 0
-                destWidth = globals.coords.boardXUnits(1)
+                destWidth = globals.coords.boardXUnits(0.5)
                 destHeight = globals.coords.boardYUnits(length)
                 toScreenY = fromScreenY - destHeight
 
-                fromScreenX = fromScreenX - globals.coords.boardXUnits(0.5)
-                toScreenX = toScreenX - globals.coords.boardXUnits(0.5)
+                fromScreenX = fromScreenX - globals.coords.boardXUnits(0.25)
+                toScreenX = toScreenX - globals.coords.boardXUnits(0.25)
 
                 bounceDestWidth = destWidth
                 bounceDestHeight = 0
                 break;
             case Direction.DOWN:
-                console.log("computing down")
-                this.rect.width = globals.coords.boardXUnits(1)
+                this.rect.width = globals.coords.boardXUnits(0.5)
                 this.rect.height = 0
-                destWidth = globals.coords.boardXUnits(1)
+                destWidth = globals.coords.boardXUnits(0.5)
                 destHeight = globals.coords.boardYUnits(length)
 
-                fromScreenX = fromScreenX - globals.coords.boardXUnits(0.5)
-                toScreenX = toScreenX - globals.coords.boardXUnits(0.5)
+                fromScreenX = fromScreenX - globals.coords.boardXUnits(0.25)
+                toScreenX = toScreenX - globals.coords.boardXUnits(0.25)
 
                 bounceDestWidth = destWidth
                 bounceDestHeight = 0
                 break;
             case Direction.LEFT:
-                console.log("computing left")
                 this.rect.width = 0
-                this.rect.height = globals.coords.boardYUnits(1)
+                this.rect.height = globals.coords.boardYUnits(0.5)
                 destWidth = globals.coords.boardXUnits(length)
-                destHeight = globals.coords.boardYUnits(1)
+                destHeight = globals.coords.boardYUnits(0.5)
                 toScreenX = fromScreenX - destWidth
 
-                fromScreenY = fromScreenY - globals.coords.boardYUnits(0.5)
-                toScreenY = toScreenY - globals.coords.boardYUnits(0.5)
+                fromScreenY = fromScreenY - globals.coords.boardYUnits(0.25)
+                toScreenY = toScreenY - globals.coords.boardYUnits(0.25)
 
                 bounceDestWidth = 0
                 bounceDestHeight = destHeight
                 break;
             case Direction.RIGHT:
-                console.log("computing right")
                 this.rect.width = 0
-                this.rect.height = globals.coords.boardYUnits(1)
+                this.rect.height = globals.coords.boardYUnits(0.5)
                 destWidth = globals.coords.boardXUnits(length)
-                destHeight = globals.coords.boardYUnits(1)
+                destHeight = globals.coords.boardYUnits(0.5)
 
-                fromScreenY = fromScreenY - globals.coords.boardYUnits(0.5)
-                toScreenY = toScreenY - globals.coords.boardYUnits(0.5)
+                fromScreenY = fromScreenY - globals.coords.boardYUnits(0.25)
+                toScreenY = toScreenY - globals.coords.boardYUnits(0.25)
 
                 bounceDestWidth = 0
                 bounceDestHeight = destHeight
@@ -130,42 +148,70 @@ class Missile {
         let bounceToScreenY = fromScreenY
 
 
-        console.log("Before tween x:", this.rect.x)
-        console.log("Before tween y:", this.rect.y)
-        console.log("Before tween width:", this.rect.width)
-        console.log("Before tween height:", this.rect.height)
-
-        console.log("Tween x: " + globals.coords.boardXToScreenX(fromX))
-        console.log("Tween y: " + globals.coords.boardXToScreenX(fromY))
-        console.log("Tween originX: " + 0.5)
-        console.log("Tween originY: " + 1)
-        console.log("Tween width: " + destWidth)
-        console.log("Tween height: " + destHeight)
-
         this.rect.setOrigin(0, 0)
         this.rect.setPosition(fromScreenX, fromScreenY)
+        this.rect.fillColor = this.toHexColor(startColor)
 
+        const TWEEN_MILLIS = 200
         this.scene.tweens.add({
             targets: this.rect,
             x: toScreenX,
             y: toScreenY,
             width: destWidth,
             height: destHeight,
-            duration: 1000,
+            duration: TWEEN_MILLIS,
             onComplete: this.bounce,
             onCompleteScope: this,
             onCompleteParams: [
                 bounceToScreenX,
                 bounceToScreenY,
                 bounceDestWidth,
-                bounceDestHeight
+                bounceDestHeight,
+                endColor,
             ]
         })
 
+
+        let fromScreenPos = globals.coords.boardPosToScreenPos({ x: fromX, y: fromY })
+        let toScreenPos = globals.coords.boardPosToScreenPos({ x: toX, y: toY })
+
+        let diffX = fromScreenPos.x - toScreenPos.x
+        let diffY = fromScreenPos.y - toScreenPos.y
+        let totalDistance = Math.sqrt(diffX * diffX + diffY * diffY)
+
+        // Compute when to explode the pieces
+        for (var i = 0; i < explodingPieces.length; i++) {
+            let piece = explodingPieces[i]
+
+            let screenPos = piece.getScreenPosition()
+            diffX = fromScreenPos.x - screenPos.x
+            diffY = fromScreenPos.y - screenPos.y
+            let pieceDistance = Math.sqrt(diffX * diffX + diffY * diffY)
+
+            let delayMillis = TWEEN_MILLIS * (pieceDistance / totalDistance)
+            this.scene.time.addEvent({
+                delay: delayMillis,
+                callback: piece.explode,
+                callbackScope: piece,
+            })
+        }
+
+        // Is there a piece that should change color?
+        if (pieceToChange) {
+            this.scene.time.addEvent({
+                delay: TWEEN_MILLIS,
+                callback: pieceToChange.changeColor,
+                callbackScope: pieceToChange,
+                args: [ startColor ]
+            })
+        }
+
     }
 
-    bounce(tween, target, destX, destY, destWidth, destHeight) {
+    bounce(tween, target, destX, destY, destWidth, destHeight, newColor) {
         console.log("bounce: " + destX + "," + destY + "," + destWidth + "," + destHeight)
+
+        this.rect.fillColor = this.toHexColor(newColor)
 
         this.scene.tweens.add({
             targets: this.rect,
@@ -173,18 +219,20 @@ class Missile {
             y: destY,
             width: destWidth,
             height: destHeight,
-            duration: 1000,
+            duration: 200,
             onComplete: this.endFire,
-            onCompleteScope: this
+            onCompleteScope: this,
+            onCompleteParams: [
+                newColor
+            ]
         })
 
     }
 
-    endFire() {
-        console.log("End fire!!!!")
-        console.log("@@@ This.firing:" + this.firing)
+    endFire(tween, target, newColor) {
+        globals.state.player.changeColor(newColor)
+
         this.firing = false
-        console.log("@@@ Globals.state.firing: " + globals.state.missile.firing)
 
         if (this.rect) {
             this.rect.width = 0

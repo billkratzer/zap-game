@@ -28,7 +28,7 @@ class AnimationFactory {
         this.scene.anims.create({
             key: "explosion",
             frames: this.scene.anims.generateFrameNumbers('sprites', { frames: this.range(8 * 18, 4) }),
-            frameRate: 8,
+            frameRate: 16,
             repeat: 0
         });
     }

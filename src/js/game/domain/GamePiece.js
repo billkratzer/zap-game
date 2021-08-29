@@ -77,8 +77,55 @@ class GamePiece {
         })
     }
 
-    endFadeIn() {
+    explode() {
+        this.exploding = true
+        this.sprite.play("explosion")
+        this.scene.time.addEvent({
+            delay: 200,
+            callback: this.startFade,
+            callbackScope: this,
+        })
 
+    }
+
+    startFade() {
+        this.scene.tweens.add({
+            targets: this.sprite,
+            alpha: 0,
+            duration: 200,
+            onComplete: this.endFade,
+            onCompleteScope: this
+        })
+    }
+
+    endFade() {
+        this.sprite.destroy()
+        // this.sprite = null
+    }
+
+    changeColor(color) {
+
+        this.scene.tweens.add({
+            targets: this.sprite,
+            scale: 1,
+            duration: 100,
+            delay: 0,
+            onComplete: this.endSpriteShrink,
+            onCompleteScope: this,
+            onCompleteParams: [ color ]
+        })
+    }
+
+    endSpriteShrink(tween, targets, color) {
+        this.type = color
+        this.sprite.play("piece-" + this.type + "-facing-" + this.direction)
+
+        this.scene.tweens.add({
+            targets: this.sprite,
+            scale: 3,
+            duration: 100,
+            delay: 0
+        })
     }
 
 
@@ -87,6 +134,14 @@ class GamePiece {
             x: this.x,
             y: this.y
         }
+    }
+
+    getBoardPosition() {
+        return this.grid.fromGridPosToBoardPos(this.x, this.y)
+    }
+
+    getScreenPosition() {
+        return globals.coords.boardPosToScreenPos(this.getBoardPosition())
     }
 
 }

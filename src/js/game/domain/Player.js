@@ -99,6 +99,7 @@ class Player {
 
     changeColor(newColor) {
         this.color = newColor
+        this.sprite.play("player-" + this.color + "-" + this.direction)
     }
 
     setPosition(x , y) {

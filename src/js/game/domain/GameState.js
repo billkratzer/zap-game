@@ -82,7 +82,8 @@ class GameState {
     }
 
     fireMissile() {
-        this.firing = {}
+
+        let firingInfo = {}
 
         // location of the missile on the board
         let mx = this.player.x
@@ -128,17 +129,23 @@ class GameState {
 
         let done = false
 
-        this.firing.explodingPieces = []
+        firingInfo.explodingPieces = []
+        firingInfo.startColor = this.player.color
+        firingInfo.endColor = this.player.color
 
         while (!done) {
             if ( grid.inBounds(gx, gy) ) {
                 let piece = grid.getPieceAt(gx, gy)
                 if (piece) {
                     if (piece.type === this.player.color) {
-                        this.firing.explodingPieces.push(piece)
+                        firingInfo.explodingPieces.push(piece)
+                        grid.setPieceAt(gx, gy, null)
+                        gx = gx + dx
+                        gy = gy + dy
                     }
                     else {
-                        this.firing.newColor = piece.type
+                        firingInfo.endColor = piece.type
+                        firingInfo.pieceToChange = piece
                         done = true
 
                     }
@@ -168,10 +175,12 @@ class GameState {
                 mx = gx + 12
                 break;
         }
-        this.firing.endPos = {
+        firingInfo.endPos = {
             x: mx,
             y: my
         }
+
+        return firingInfo
     }
 
 }
