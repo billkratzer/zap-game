@@ -58,7 +58,7 @@ class GameState {
     }
 
     getLevelSeconds() {
-        return 10
+        return 25
     }
 
     on(event, callback, context) {
@@ -66,7 +66,7 @@ class GameState {
     }
 
     getNewPieceSeconds() {
-        let secondsByLevel = [5, 4, 3, 2, 1, 0.5, 0.25]
+        let secondsByLevel = [2, 1.5, 1.25, 1, 0.75, 0.5, 0.25]
 
         let index = this.level - 1
         if (index < secondsByLevel.length) {
