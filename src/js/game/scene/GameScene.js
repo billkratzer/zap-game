@@ -1,3 +1,5 @@
+let rainbowWave = 0
+
 class GameScene extends Phaser.Scene {
 
 
@@ -36,16 +38,22 @@ class GameScene extends Phaser.Scene {
             let width = camera.width
             let height = camera.height
 
-            let rect = this.add.rectangle(width / 2, height / 2, width *.60, height * .40, 0x000000)
+            let rect = this.add.rectangle(
+                0,
+                0,
+                globals.coords.screenWidth,
+                globals.coords.screenHeight,
+                0x000000)
+                .setOrigin(0, 0)
+                .setAlpha(0.80)
+
+            let text1 = this.add.bitmapText(width / 2, height * 0.40, 'game-font', 'Game Paused', 64)
                 .setOrigin(0.5, 0.5)
 
-            let text1 = this.add.bitmapText(width / 2, height * 0.40, 'game-font', 'Game Paused', 36)
+            let text2 = this.add.bitmapText(width / 2, height * 0.55, 'game-font', 'Press Esc to resume', 24)
                 .setOrigin(0.5, 0.5)
 
-            let text2 = this.add.bitmapText(width / 2, height * 0.55, 'game-font', 'Press [Esc] to resume', 24)
-                .setOrigin(0.5, 0.5)
-
-            let text3 = this.add.bitmapText(width / 2, height * 0.62, 'game-font', 'Press [q] to quit', 24)
+            let text3 = this.add.bitmapText(width / 2, height * 0.62, 'game-font', 'Press Q to quit', 24)
                 .setOrigin(0.5, 0.5)
 
             this.layers.modal.add([rect, text1, text2, text3])
@@ -215,6 +223,10 @@ class GameScene extends Phaser.Scene {
         }
 
         switch (code) {
+            case "Enter":
+                globals.state.forceGameOver()
+                globals.state.forcePaused()
+                break
             case "ArrowLeft":
                 globals.state.player.move(Direction.LEFT, -1, 0)
                 break
@@ -336,6 +348,8 @@ class GameScene extends Phaser.Scene {
     }
 
     gameOver() {
+        globals.state.forcePaused()
+
         this.layers.gameOver = this.add.layer().setDepth(2000)
         this.layers.gameOver.setVisible(true)
 
@@ -350,15 +364,34 @@ class GameScene extends Phaser.Scene {
             globals.coords.screenHeight,
             0x000000)
             .setOrigin(0, 0)
-            .setAlpha(0.85)
+            .setAlpha(0.80)
 
-        let text1 = this.add.bitmapText(width / 2, height * 0.40, 'game-over-font', 'GAME OVER', 96)
-            .setOrigin(0.5, 0.5)
+        // let text1 = this.add.bitmapText(width / 2, height * 0.40, 'game-over-font', 'callBack', 96)
+        //     .setOrigin(0.5, 0.5)
+        let text1 = this.add.dynamicBitmapText(width / 2, height * 0.40, 'game-over-font', 'GAME OVER', 96)
+             .setOrigin(0.5, 0.5)
+        text1.setDisplayCallback(this.gameOverTextCallback);
 
         let text2 = this.add.bitmapText(width / 2, height * 0.55, 'game-font', 'Press [Space] to quit', 24)
             .setOrigin(0.5, 0.5)
 
         this.layers.gameOver.add([rect, text1, text2])
+    }
+
+    gameOverTextCallback(data) {
+        // https://www.color-hex.com/color-palette/109407
+        let colors = [0x00aed9, 0x53da3f, 0xffe71a, 0xff983a, 0x000000, 0xff17a3]
+
+        data.color = colors[ data.index % colors.length ]
+
+        let degrees = rainbowWave + data.index * 15
+        degrees = degrees % 360
+
+        let radians = degrees * Math.PI / 180.0
+        data.y = data.y + Math.sin(radians) * 5;
+
+        rainbowWave += 1;
+        return data
     }
 
     update() {
