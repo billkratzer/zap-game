@@ -17,6 +17,7 @@ class GameState {
         this.BOARD_WIDTH = 20
         this.BOARD_HEIGHT = 14
 
+        this.forceOver = false
 
         this.grids = []
         this.leftGrid = new GameGrid(8, 4, Side.LEFT, 0, 5)
@@ -35,6 +36,10 @@ class GameState {
 
         this.player = new Player(PlayerColor.GREEN, this.playerBounds)
         this.missile = new Missile()
+    }
+
+    forcePaused() {
+        this.paused = true
     }
 
     togglePaused() {
@@ -85,7 +90,15 @@ class GameState {
         this.score = this.score + points
     }
 
+    forceGameOver() {
+        this.forceOver = true
+    }
+
     isGameOver() {
+        if (this.forceOver) {
+            return true
+        }
+
         let over = false
         this.grids.forEach(
             grid => {
