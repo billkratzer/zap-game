@@ -57,9 +57,15 @@ class BootScene extends Phaser.Scene {
     }
 
     create () {
+
+        let camera = this.cameras.main
+
+        globals.state = new GameState()
+        globals.coords = new ScreenCoords(camera.width, camera.height, globals.state.BOARD_WIDTH, globals.state.BOARD_HEIGHT)
+
         // this.scene.start('GameScene');
-        // this.scene.start('SelectGameScene');
-        this.scene.start('TitleScene');
+        this.scene.start('HighScoreScene');
+        // this.scene.start('TitleScene');
     }
 
     update() {

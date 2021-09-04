@@ -11,8 +11,8 @@ class GameScene extends Phaser.Scene {
         this.sprites = {}
         this.shapes = {}
         this.timers = {}
-
         this.counts = {}
+        this.state = {}
     }
 
     preload () {
@@ -73,8 +73,6 @@ class GameScene extends Phaser.Scene {
     create () {
         let camera = this.cameras.main
         camera.setBackgroundColor("#333")
-
-        globals.coords = new ScreenCoords(camera.width, camera.height, globals.state.BOARD_WIDTH, globals.state.BOARD_HEIGHT)
 
         this.layers.bottom = this.add.layer().setDepth(0)
         this.layers.dots = this.add.layer().setDepth(1)
@@ -195,16 +193,9 @@ class GameScene extends Phaser.Scene {
     }
 
     keyDown(code) {
-        console.log(code)
-        if (globals.state.isGameOver()) {
-            switch (code) {
-                case "Escape":
-                    this.scene.start('TitleScene');
-                    break;
-                case "Space":
-                    this.scene.start('TitleScene');
-                    break;
-            }
+        // console.log(code)
+        if (this.state.gameOverInputAllowed) {
+            this.scene.start('HighScoreScene');
             return
         }
 
@@ -252,9 +243,14 @@ class GameScene extends Phaser.Scene {
     }
 
     click(pointer, localX, localY, event) {
+        if (this.state.gameOverInputAllowed) {
+            this.scene.start('HighScoreScene');
+            return
+        }
         if (this.counts.gameOver > 0) {
             return
         }
+
         globals.state.addNewPiece(this, this.layers.pieces)
     }
 
@@ -353,9 +349,8 @@ class GameScene extends Phaser.Scene {
         this.layers.gameOver = this.add.layer().setDepth(2000)
         this.layers.gameOver.setVisible(true)
 
-        let camera = this.cameras.main
-        let width = camera.width
-        let height = camera.height
+        let width = globals.coords.screenWidth
+        let height = globals.coords.screenHeight
 
         let rect = this.add.rectangle(
             0,
@@ -364,16 +359,35 @@ class GameScene extends Phaser.Scene {
             globals.coords.screenHeight,
             0x000000)
             .setOrigin(0, 0)
-            .setAlpha(0.80)
+            .setAlpha(0.85)
 
-        // let text1 = this.add.bitmapText(width / 2, height * 0.40, 'game-over-font', 'callBack', 96)
-        //     .setOrigin(0.5, 0.5)
-        let text1 = this.add.dynamicBitmapText(width / 2, height * 0.40, 'game-over-font', 'GAME OVER', 96)
-             .setOrigin(0.5, 0.5)
-        text1.setDisplayCallback(this.gameOverTextCallback);
-
-        let text2 = this.add.bitmapText(width / 2, height * 0.55, 'game-font', 'Press [Space] to quit', 24)
+        const FONT = 'game-over-font'
+        let text1 = this.add.dynamicBitmapText(width / 2, 0 - height, FONT, "GAME OVER", 96)
             .setOrigin(0.5, 0.5)
+            .setDisplayCallback(this.gameOverTextCallback);
+
+        this.tweens.add({
+            targets: text1,
+            y: height * 0.35,
+            duration: 1000,
+            ease: 'Back',
+            easeParams: [ 0.5 ]
+        })
+
+        let text2 = this.add.bitmapText(width / 2, height + height, FONT, "SCORE:  " + globals.state.score, 48)
+            .setOrigin(0.5, 0.5)
+
+        this.tweens.add({
+            targets: text2,
+            y: height * 0.55,
+            duration: 1000,
+            ease: 'Back',
+            easeParams: [ 0.5 ],
+            onComplete: function() {
+                this.state.gameOverInputAllowed = true
+            },
+            onCompleteScope: this
+        })
 
         this.layers.gameOver.add([rect, text1, text2])
     }
