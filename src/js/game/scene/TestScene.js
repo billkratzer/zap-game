@@ -3,8 +3,13 @@ class TestScene extends Phaser.Scene {
 
     constructor () {
         super({ key: 'TestScene' });
+    }
 
-        console.log("TestScene.()")
+    preload () {
+        this.tools.animationFactory = new AnimationFactory(this)
+    }
+
+    init() {
         this.layers = {}
         this.texts = {}
         this.sprites = {}
@@ -14,12 +19,8 @@ class TestScene extends Phaser.Scene {
         this.colors = ["green", "blue", "orange", "purple"]
     }
 
-    preload () {
-        this.tools.animationFactory = new AnimationFactory(this)
-    }
 
-
-    create () {
+    create() {
         this.layers.bottom = this.add.layer().setDepth(0)
         this.layers.dots = this.add.layer().setDepth(1)
         this.layers.player = this.add.layer().setDepth(2)
