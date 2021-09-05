@@ -48,14 +48,17 @@ class GameScene extends Phaser.Scene {
         //const FONT = 'game-font'
         this.texts.score = this.add.bitmapText(10, 80, FONT, "", 64)
             .setOrigin(0, 1)
+            .setLetterSpacing(2)
             .setTint(this.theme.text.color)
 
         this.texts.level = this.add.bitmapText(coords.screenWidth - 15, 80, FONT, "", 64)
             .setOrigin(1, 1)
+            .setLetterSpacing(4)
             .setTint(this.theme.text.color)
 
         this.texts.time = this.add.bitmapText(coords.screenWidth - 15, coords.screenHeight + 5, FONT, "", 64)
             .setOrigin(1, 1)
+            .setLetterSpacing(2)
             .setTint(this.theme.text.color)
 
         this.layers.info.add([this.texts.score, this.texts.level, this.texts.time])
