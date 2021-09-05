@@ -2,14 +2,13 @@ let rainbowWave = 0
 
 class GameScene extends Phaser.Scene {
 
-
     constructor () {
         super({ key: 'GameScene' });
-
-        console.log("GameScene::constructor()")
     }
 
     init() {
+        console.log("GameScene::init()")
+
         this.layers = {}
         this.texts = {}
         this.sprites = {}
@@ -20,17 +19,11 @@ class GameScene extends Phaser.Scene {
 
         globals.state = new GameState()
 
-        console.log("Let log globals.state.forceOver: " + globals.state.forceOver)
-
-        console.log("GameScene::init()")
+        this.counts.gameOver = 0
     }
 
-    preload () {
-        console.log("GameScene::preload()")
-
+    preload() {
         globals.animationFactory = new AnimationFactory(this)
-
-        this.counts.gameOver = 0
     }
 
 
@@ -82,7 +75,6 @@ class GameScene extends Phaser.Scene {
     }
 
     create () {
-        console.log("GameScene::create()")
 
         let camera = this.cameras.main
         camera.setBackgroundColor("#333")
@@ -185,7 +177,6 @@ class GameScene extends Phaser.Scene {
 
         // if we are already firing, do nothing
         if (state.missile.firing) {
-            console.log("Already Firing!!!!!")
             return
         }
 
@@ -208,7 +199,6 @@ class GameScene extends Phaser.Scene {
     keyDown(code) {
         // console.log(code)
         if (this.state.gameOverInputAllowed) {
-            console.log("Game Over Input Allowed!")
             this.scene.start('NewHighScoreScene');
             return
         }
@@ -229,7 +219,6 @@ class GameScene extends Phaser.Scene {
 
         switch (code) {
             case "Enter":
-                console.log("I'm forcing is bitches!")
                 globals.state.forceGameOver()
                 globals.state.forcePaused()
                 break
@@ -359,8 +348,6 @@ class GameScene extends Phaser.Scene {
     }
 
     gameOver() {
-        console.log("Game Over!!!!!!!!")
-
         globals.state.forcePaused()
 
         this.layers.gameOver = this.add.layer().setDepth(2000)
@@ -434,7 +421,6 @@ class GameScene extends Phaser.Scene {
         this.updateInfo()
 
         if (globals.state.isGameOver()) {
-            console.log("Game is over in update!!!")
             if (this.counts.gameOver == 0) {
                 this.gameOver()
             }
