@@ -169,7 +169,8 @@ class NewHighScoreScene extends Phaser.Scene {
     }
 
     keyDown(event) {
-        console.log(event.code + " - " + event.key)
+
+        // handle backspace and delete
         if ((event.code == "Delete") || (event.code == "Backspace")) {
             if (this.temp.name.length > 0) {
                 this.temp.name = this.temp.name.substring(0, this.temp.name.length - 1);
@@ -177,6 +178,7 @@ class NewHighScoreScene extends Phaser.Scene {
             return
         }
 
+        // handle enter and return
         if ((event.code == "Enter") || (event.code == "Return")) {
             if (this.temp.name.length > 0) {
                 this.temp.highScores.addHighScore(globals.state.score, this.temp.name)
@@ -186,11 +188,13 @@ class NewHighScoreScene extends Phaser.Scene {
             }
         }
 
+        // check for banned characters (that screw up encoding)
         let banned = ["\"", "'", ":"]
         if (banned.indexOf(event.key) > -1) {
             return
         }
 
+        // append to the name if a valid character and if length is less than 20
         if ((event.key.length == 1) && (this.temp.name.length < 20)) {
             this.temp.name = this.temp.name + event.key.toUpperCase()
         }

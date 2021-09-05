@@ -8,8 +8,6 @@ class HighScoreScene extends Phaser.Scene {
     }
 
     create () {
-        console.log("HighScoreScene.create()")
-
         let highScores = new HighScores()
 
         let screenWidth = globals.coords.screenWidth

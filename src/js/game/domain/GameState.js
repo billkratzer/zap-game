@@ -97,7 +97,6 @@ class GameState {
 
     isGameOver() {
         if (this.forceOver) {
-            console.log("Games is FORCED OVER: " + this.forceOver)
             return true
         }
 
