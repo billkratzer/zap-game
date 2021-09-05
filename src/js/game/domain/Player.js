@@ -64,7 +64,7 @@ class Player {
             targets: this.sprite,
             x: globals.coords.boardXToScreenX(this.x),
             y: globals.coords.boardYToScreenY(this.y),
-            duration: 100,
+            duration: 50,
             delay: 0,
             onComplete: this.endMoveSprite,
             onCompleteScope: this
