@@ -29,53 +29,6 @@ class GameScene extends Phaser.Scene {
     }
 
 
-    togglePause() {
-        let state = globals.state
-        state.togglePaused()
-
-        if (globals.state.paused) {
-            this.timers.levelTimer.paused = true
-            this.timers.newPieceTimer.paused = true
-            this.layers.modal = this.add.layer().setDepth(1000)
-            this.layers.modal.setAlpha(0.85)
-            this.layers.modal.setVisible(true)
-
-            let camera = this.cameras.main
-            let width = camera.width
-            let height = camera.height
-
-            let rect = this.add.rectangle(
-                0,
-                0,
-                globals.coords.screenWidth,
-                globals.coords.screenHeight,
-                0x000000)
-                .setOrigin(0, 0)
-                .setAlpha(0.80)
-
-            let text1 = this.add.bitmapText(width / 2, height * 0.40, 'game-font', 'Game Paused', 64)
-                .setOrigin(0.5, 0.5)
-
-            let text2 = this.add.bitmapText(width / 2, height * 0.55, 'game-font', 'Press Esc to resume', 24)
-                .setOrigin(0.5, 0.5)
-
-            let text3 = this.add.bitmapText(width / 2, height * 0.62, 'game-font', 'Press Q to quit', 24)
-                .setOrigin(0.5, 0.5)
-
-            this.layers.modal.add([rect, text1, text2, text3])
-        }
-        else {
-            this.timers.levelTimer.paused = false
-            this.timers.newPieceTimer.paused = false
-            this.layers.modal.destroy()
-            this.layers.modal = null
-        }
-    }
-
-    quit() {
-        this.scene.start('TitleScene')
-    }
-
     create () {
 
         let camera = this.cameras.main
@@ -177,6 +130,53 @@ class GameScene extends Phaser.Scene {
         this.initNewPieceTimer()
     }
 
+    togglePause() {
+        let state = globals.state
+        state.togglePaused()
+
+        if (globals.state.paused) {
+            this.timers.levelTimer.paused = true
+            this.timers.newPieceTimer.paused = true
+            this.layers.modal = this.add.layer().setDepth(1000)
+            this.layers.modal.setAlpha(0.85)
+            this.layers.modal.setVisible(true)
+
+            let camera = this.cameras.main
+            let width = camera.width
+            let height = camera.height
+
+            let rect = this.add.rectangle(
+                0,
+                0,
+                globals.coords.screenWidth,
+                globals.coords.screenHeight,
+                0x000000)
+                .setOrigin(0, 0)
+                .setAlpha(0.80)
+
+            let text1 = this.add.bitmapText(width / 2, height * 0.40, 'game-font', 'Game Paused', 64)
+                .setOrigin(0.5, 0.5)
+
+            let text2 = this.add.bitmapText(width / 2, height * 0.55, 'game-font', 'Press Esc to resume', 24)
+                .setOrigin(0.5, 0.5)
+
+            let text3 = this.add.bitmapText(width / 2, height * 0.62, 'game-font', 'Press Q to quit', 24)
+                .setOrigin(0.5, 0.5)
+
+            this.layers.modal.add([rect, text1, text2, text3])
+        }
+        else {
+            this.timers.levelTimer.paused = false
+            this.timers.newPieceTimer.paused = false
+            this.layers.modal.destroy()
+            this.layers.modal = null
+        }
+    }
+
+    quit() {
+        this.scene.start('TitleScene')
+    }
+
     fireMissile() {
         let state = globals.state
 
@@ -252,7 +252,7 @@ class GameScene extends Phaser.Scene {
 
     click(pointer, localX, localY, event) {
         if (this.state.gameOverInputAllowed) {
-            //this.scene.start('NewHighScoreScene');
+            this.scene.start('NewHighScoreScene');
             return
         }
         if (this.counts.gameOver > 0) {
