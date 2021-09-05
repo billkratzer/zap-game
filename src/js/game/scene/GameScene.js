@@ -17,6 +17,8 @@ class GameScene extends Phaser.Scene {
         this.counts = {}
         this.state = {}
 
+        this.theme = globals.colors.getTheme("default")
+
         globals.state = new GameState()
 
         this.counts.gameOver = 0
@@ -77,7 +79,7 @@ class GameScene extends Phaser.Scene {
     create () {
 
         let camera = this.cameras.main
-        camera.setBackgroundColor("#333")
+        camera.setBackgroundColor(this.theme.background)
 
         this.layers.bottom = this.add.layer().setDepth(0)
         this.layers.dots = this.add.layer().setDepth(1)
@@ -95,6 +97,7 @@ class GameScene extends Phaser.Scene {
             ' ',
             64)
             .setOrigin(0, 0)
+            .setTint(this.theme.text.color)
 
         this.texts.level = this.add.bitmapText(
             globals.coords.screenWidth - 10,
@@ -103,6 +106,7 @@ class GameScene extends Phaser.Scene {
             'Level: ',
             64)
             .setOrigin(1, 0)
+            .setTint(this.theme.text.color)
 
         this.texts.time = this.add.bitmapText(
             globals.coords.screenWidth - 10,
@@ -111,6 +115,7 @@ class GameScene extends Phaser.Scene {
             'Time: ',
             64)
             .setOrigin(1, 1)
+            .setTint(this.theme.text.color)
 
         this.layers.info.add([this.texts.score, this.texts.level, this.texts.time])
 
@@ -121,7 +126,7 @@ class GameScene extends Phaser.Scene {
             globals.coords.getScreenMiddleY(),
             globals.coords.boardXUnits(4),
             globals.coords.boardYUnits(4),
-            0xff0000)
+            this.theme.pit.color)
             .setOrigin(0.5, 0.5)
         this.layers.bottom.add(playerRectBox)
 
@@ -133,7 +138,7 @@ class GameScene extends Phaser.Scene {
                     globals.coords.boardXToScreenX(x),
                     globals.coords.boardYToScreenY(y),
                     2,
-                    0xffffff)
+                    this.theme.dots.color)
                     .setOrigin(0.5, 0.5)
                 this.layers.dots.add(dot)
             }
@@ -145,7 +150,7 @@ class GameScene extends Phaser.Scene {
                     globals.coords.boardXToScreenX(x),
                     globals.coords.boardYToScreenY(y),
                     2,
-                    0xffffff)
+                    this.theme.dots.color)
                     .setOrigin(0.5, 0.5)
                 this.layers.dots.add(dot)
             }
