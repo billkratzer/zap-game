@@ -7,6 +7,11 @@ class HighScoreScene extends Phaser.Scene {
     preload () {
     }
 
+    init() {
+        this.vars = {}
+        this.vars.allowInput = false
+    }
+
     create () {
         let highScores = new HighScores()
 
@@ -14,26 +19,50 @@ class HighScoreScene extends Phaser.Scene {
         let screenHeight = globals.coords.screenHeight
 
         // Screen Title
-        const FONT = "game-font"
-        let titleText = this.add.bitmapText( screenWidth / 2, 20, FONT, "High Scores", 64)
-            .setOrigin(0.5, 0)
+        const BIG_FONT = "kanit-64-semibold"
+
+        let topTitleText = this.add.bitmapText( screenWidth / 2, 0 - screenHeight, BIG_FONT, "HIGH SCORES", 64)
+            .setOrigin(0.5, 0.5)
+            .setLetterSpacing(4)
+            .setTint(0xff983a)
+
+        this.tweens.add({
+            targets: topTitleText,
+            y: globals.coords.getScreenFractionY(.08),
+            delay: 500,
+            duration: 1000,
+            ease: 'Back',
+            easeParams: [ 0.5 ]
+        });
 
         let y = screenHeight * .20
 
         // Table Title
         let titleTint = Phaser.Display.Color.HexStringToColor("#85C1E9")
 
-        let rankTitleText = this.add.bitmapText(screenWidth * 0.30, y, FONT, "Rank", 32)
+        const FONT = "kanit-32-medium"
+        let rankTitleText = this.add.bitmapText(screenWidth * 0.30, 0 - screenHeight, FONT, "RANK", 32)
             .setOrigin(0.5, 0.5)
             .setTint(titleTint.color)
 
-        let scoreTitleText = this.add.bitmapText(screenWidth * 0.55, y, FONT, "Score", 32)
+        let scoreTitleText = this.add.bitmapText(screenWidth * 0.55, 0 - screenHeight, FONT, "SCORE", 32)
             .setOrigin(1, 0.5)
             .setTint(titleTint.color)
 
-        let nameTitleText = this.add.bitmapText(screenWidth * 0.65, y, FONT, "Name", 32)
+        let nameTitleText = this.add.bitmapText(screenWidth * 0.65, 0 - screenHeight, FONT, "NAME", 32)
             .setOrigin(0, 0.5)
             .setTint(titleTint.color)
+
+
+        this.tweens.add({
+            targets: [rankTitleText, scoreTitleText, nameTitleText],
+            y: y,
+            delay: 0,
+            duration: 1000,
+            ease: 'Back',
+            easeParams: [ 0.5 ]
+        });
+
 
         let titleTints = []
         for (var i = 0; i <= 20; i++) {
@@ -150,15 +179,25 @@ class HighScoreScene extends Phaser.Scene {
             y = y + 48
         }
 
+        // Defer allowed input until 2 seconds (after the tweens have run)
+        this.time.addEvent({
+            delay: 2000,
+            callback: function() {
+                this.vars.allowInput = true
+            },
+            callbackScope: this
+        });
 
-        this.input.on('pointerup', function(pointer, localX, localY, event) {
-            this.nextScene()
-        }, this)
+        // Input handlers
+        this.input.on('pointerup', this.handleInput, this)
+        this.input.keyboard.on('keydown', this.handleInput, this)
 
-        this.input.keyboard.on('keydown', function(pointer, localX, localY, event) {
-            this.nextScene()
-        }, this)
+    }
 
+    handleInput() {
+        if ( this.vars.allowInput ) {
+            this.scene.start('TitleScene');
+        }
     }
 
     titleTextUpdate(tween, counter, texts, tintColors) {
@@ -173,15 +212,6 @@ class HighScoreScene extends Phaser.Scene {
             let text = texts[i]
             text.setTint(tintColors[Math.floor(counter.value)].color)
         }
-    }
-
-    nextScene() {
-        // this.introMusic.stop();
-        this.scene.start('TitleScene');
-        // this.scene.start('TestScene');
-    }
-
-    update() {
     }
 
 }

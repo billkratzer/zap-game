@@ -36,6 +36,8 @@ class BootScene extends Phaser.Scene {
         this.loadFont("helvetica-neue-white-32")
         this.loadFont("helvetica-neue-thin-gray-24")
         this.loadFont("kanit-32-thin")
+        this.loadFont("kanit-32-medium")
+        this.loadFont("kanit-64-semibold")
         this.loadFont("kanit-96-glow")
 
         // Sprites
@@ -66,7 +68,8 @@ class BootScene extends Phaser.Scene {
 
         // this.scene.start('GameScene');
         // this.scene.start('NewHighScoreScene');
-        this.scene.start('TitleScene');
+        //this.scene.start('HighScoreScene');
+         this.scene.start('TitleScene');
     }
 
     update() {
