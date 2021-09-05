@@ -41,32 +41,20 @@ class GameScene extends Phaser.Scene {
         this.layers.pieces = this.add.layer().setDepth(4)
         this.layers.info = this.add.layer().setDepth(10)
 
+        let coords = globals.coords
 
         // Info Layer
-        this.texts.score = this.add.bitmapText(
-            0 + 10,
-            0,
-            'game-font',
-            ' ',
-            64)
-            .setOrigin(0, 0)
+        const FONT = 'kanit-64-semibold'
+        //const FONT = 'game-font'
+        this.texts.score = this.add.bitmapText(10, 80, FONT, "", 64)
+            .setOrigin(0, 1)
             .setTint(this.theme.text.color)
 
-        this.texts.level = this.add.bitmapText(
-            globals.coords.screenWidth - 10,
-            0,
-            'game-font',
-            'Level: ',
-            64)
-            .setOrigin(1, 0)
+        this.texts.level = this.add.bitmapText(coords.screenWidth - 15, 80, FONT, "", 64)
+            .setOrigin(1, 1)
             .setTint(this.theme.text.color)
 
-        this.texts.time = this.add.bitmapText(
-            globals.coords.screenWidth - 10,
-            globals.coords.screenHeight - 10,
-            'game-font',
-            'Time: ',
-            64)
+        this.texts.time = this.add.bitmapText(coords.screenWidth - 15, coords.screenHeight + 5, FONT, "", 64)
             .setOrigin(1, 1)
             .setTint(this.theme.text.color)
 
@@ -75,10 +63,10 @@ class GameScene extends Phaser.Scene {
 
         // Bottom Layer
         let playerRectBox = this.add.rectangle(
-            globals.coords.getScreenMiddleX(),
-            globals.coords.getScreenMiddleY(),
-            globals.coords.boardXUnits(4),
-            globals.coords.boardYUnits(4),
+            coords.getScreenMiddleX(),
+            coords.getScreenMiddleY(),
+            coords.boardXUnits(4),
+            coords.boardYUnits(4),
             this.theme.pit.color)
             .setOrigin(0.5, 0.5)
         this.layers.bottom.add(playerRectBox)
@@ -88,8 +76,8 @@ class GameScene extends Phaser.Scene {
         for (let x = 0; x < globals.state.BOARD_WIDTH; x++) {
             for (let y = 5; y < 9; y++) {
                 let dot = this.add.circle(
-                    globals.coords.boardXToScreenX(x),
-                    globals.coords.boardYToScreenY(y),
+                    coords.boardXToScreenX(x),
+                    coords.boardYToScreenY(y),
                     2,
                     this.theme.dots.color)
                     .setOrigin(0.5, 0.5)
@@ -100,8 +88,8 @@ class GameScene extends Phaser.Scene {
         for (let x = 8; x < 12; x++) {
             for (let y = 0; y < globals.state.BOARD_HEIGHT; y++) {
                 let dot = this.add.circle(
-                    globals.coords.boardXToScreenX(x),
-                    globals.coords.boardYToScreenY(y),
+                    coords.boardXToScreenX(x),
+                    coords.boardYToScreenY(y),
                     2,
                     this.theme.dots.color)
                     .setOrigin(0.5, 0.5)
@@ -117,13 +105,9 @@ class GameScene extends Phaser.Scene {
 
 
         // Events
-
         this.input.on('pointerdown', this.click, this);
 
-        this.input.keyboard.on('keydown', function (event) {
-            this.keyDown(event.code);
-
-        }, this);
+        this.input.keyboard.on('keydown', this.keyDown, this);
 
 
         this.initLevelTimer()
@@ -201,7 +185,8 @@ class GameScene extends Phaser.Scene {
         )
     }
 
-    keyDown(code) {
+    keyDown(event) {
+        let code = event.code
         if (this.state.gameOverInputAllowed) {
             this.scene.start('NewHighScoreScene');
             return
@@ -308,7 +293,7 @@ class GameScene extends Phaser.Scene {
 
     updateInfo() {
         this.texts.score.setText("" + globals.state.score)
-        this.texts.level.setText("Level: " + globals.state.level)
+        this.texts.level.setText("LEVEL: " + globals.state.level)
 
         if (this.timers.levelTimer) {
             this.texts.time.setText("" + Math.ceil(this.timers.levelTimer.getRemainingSeconds()))
