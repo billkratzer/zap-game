@@ -41,7 +41,10 @@ class BootScene extends Phaser.Scene {
         this.loadFont("kanit-96-glow")
 
         // Sprites
-        this.load.spritesheet("sprites", "./asset/image/sprite-sheet.png",
+        this.load.spritesheet("sprites-1", "./asset/image/sprite-sheet-1.png",
+            { frameWidth: 16, frameHeight: 16 }
+        )
+        this.load.spritesheet("sprites-2", "./asset/image/sprite-sheet-2.png",
             { frameWidth: 16, frameHeight: 16 }
         )
 

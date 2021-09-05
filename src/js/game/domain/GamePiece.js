@@ -79,7 +79,7 @@ class GamePiece {
 
     explode(points) {
         this.exploding = true
-        this.sprite.play("explosion")
+        this.sprite.play("explosion-" + this.type)
         this.scene.tweens.add({
             targets: this.sprite,
             scale: 0.5,

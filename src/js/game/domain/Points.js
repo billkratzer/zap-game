@@ -13,9 +13,9 @@ class Points {
         this.text = this.scene.add.bitmapText(
             this.screenX,
             this.screenY,
-            "points-font",
+            "kanit-32-medium",
             "" + this.points,
-            64)
+            48)
             .setOrigin(0.5, 0.5)
 
         this.layer.add(this.text)
