@@ -6,6 +6,10 @@ class GameScene extends Phaser.Scene {
     constructor () {
         super({ key: 'GameScene' });
 
+        console.log("GameScene::constructor()")
+    }
+
+    init() {
         this.layers = {}
         this.texts = {}
         this.sprites = {}
@@ -13,10 +17,17 @@ class GameScene extends Phaser.Scene {
         this.timers = {}
         this.counts = {}
         this.state = {}
+
+        globals.state = new GameState()
+
+        console.log("Let log globals.state.forceOver: " + globals.state.forceOver)
+
+        console.log("GameScene::init()")
     }
 
     preload () {
-        globals.state = new GameState()
+        console.log("GameScene::preload()")
+
         globals.animationFactory = new AnimationFactory(this)
 
         this.counts.gameOver = 0
@@ -71,6 +82,8 @@ class GameScene extends Phaser.Scene {
     }
 
     create () {
+        console.log("GameScene::create()")
+
         let camera = this.cameras.main
         camera.setBackgroundColor("#333")
 
@@ -195,7 +208,8 @@ class GameScene extends Phaser.Scene {
     keyDown(code) {
         // console.log(code)
         if (this.state.gameOverInputAllowed) {
-            this.scene.start('HighScoreScene');
+            console.log("Game Over Input Allowed!")
+            this.scene.start('NewHighScoreScene');
             return
         }
 
@@ -215,6 +229,7 @@ class GameScene extends Phaser.Scene {
 
         switch (code) {
             case "Enter":
+                console.log("I'm forcing is bitches!")
                 globals.state.forceGameOver()
                 globals.state.forcePaused()
                 break
@@ -244,7 +259,7 @@ class GameScene extends Phaser.Scene {
 
     click(pointer, localX, localY, event) {
         if (this.state.gameOverInputAllowed) {
-            this.scene.start('HighScoreScene');
+            //this.scene.start('NewHighScoreScene');
             return
         }
         if (this.counts.gameOver > 0) {
@@ -344,6 +359,8 @@ class GameScene extends Phaser.Scene {
     }
 
     gameOver() {
+        console.log("Game Over!!!!!!!!")
+
         globals.state.forcePaused()
 
         this.layers.gameOver = this.add.layer().setDepth(2000)
@@ -417,6 +434,7 @@ class GameScene extends Phaser.Scene {
         this.updateInfo()
 
         if (globals.state.isGameOver()) {
+            console.log("Game is over in update!!!")
             if (this.counts.gameOver == 0) {
                 this.gameOver()
             }

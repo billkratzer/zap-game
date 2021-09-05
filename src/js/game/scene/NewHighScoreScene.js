@@ -10,58 +10,210 @@ class NewHighScoreScene extends Phaser.Scene {
     create () {
         console.log("HighScoreScene.create()")
 
-        let highScores = new HighScores()
+        this.layers = {}
+        this.layers.text = this.add.layer().setDepth(2)
+        this.layers.mask = this.add.layer().setDepth(1)
+        this.layers.fireworks = this.add.layer().setDepth(0)
 
-        let screenWidth = globals.coords.screenWidth
-        let screenHeight = globals.coords.screenHeight
+        this.temp = {}
+        this.temp.name = ""
+        this.temp.allowInput = false
+        this.temp.underscoreVisible = false
+        this.temp.highScores = new HighScores()
 
-        const FONT = "helvetica-neue-white-32"
-        let titleText = this.add.bitmapText( screenWidth / 2, 10, FONT, "High Scores", 32)
-        titleText.setOrigin(0.5, 0.5)
+        this.texts = {}
 
-        let rankTitleText = this.add.bitmapText(screenWidth * 0.30, 40, FONT, "Rank", 24)
-        rankTitleText.setOrigin(0.5, 0.5)
+        let score = globals.state.score
+        // score = 512000
 
-        let scoreTitleText = this.add.bitmapText(screenWidth * 0.50, 40, FONT, "Score", 24)
-        scoreTitleText.setOrigin(1, 0.5)
+        if (!this.temp.highScores.isHighScore(score)) {
+            this.nextScene()
+            return
+        }
 
-        let nameTitleText = this.add.bitmapText(screenWidth * 0.60, 40, FONT, "Name", 24)
-        nameTitleText.setOrigin(1, 0.5)
+        globals.temp.rainbow = shuffle(globals.colors.palettes.rainbow)
 
-        for (var i = 0; i < highScores.scores.length; i++) {
-            let score = highScores.scores[i]
-            let rank = i + 1
 
-            let rankText = this.add.bitmapText(screenWidth * 0.30, i * 40 + 80, FONT, "" + rank, 24)
-            rankText.setOrigin(0.5, 0.5)
+        let coords = globals.coords
+        let screenWidth = coords.screenWidth
+        let screenHeight = coords.screenHeight
 
-            let pointsText = this.add.bitmapText(screenWidth * 0.50, i * 40 + 80, FONT, score.points, 24)
-            pointsText.setOrigin(1, 0.5)
+        const FONT = "kanit-96-glow"
+        //const FONT = "helvetica-neue-white-32"
+        let congratsText = this.add.dynamicBitmapText(coords.getScreenFractionX(0.51), 0 - screenHeight, FONT, "CONGRATULATIONS!", 96)
+            .setLetterSpacing(4)
+            .setDisplayCallback(this.congratulationsTextCallback)
+            .setOrigin(0.5, 0.5)
 
-            let nameText = this.add.bitmapText(screenWidth * 0.60, i * 40 + 80, FONT, score.name, 24)
-            nameText.setOrigin(0, 0.5)
+        let messageText = this.add.bitmapText(0 - screenWidth, screenHeight * 0.25, FONT, "YOU HAVE A HIGH SCORE!", 48)
+            .setTint(0x6cc5ce)
+            .setOrigin(0.5, 0.5)
+
+        let scoreText = this.add.bitmapText(screenWidth * 2, screenHeight * 0.35, FONT, "#" + this.temp.highScores.getHighScoreRank(score) + "     " + score, 64)
+            .setTint(0xfee71a)
+            .setOrigin(0.5, 0.5)
+
+        let enterText = this.add.bitmapText( screenWidth / 2, screenHeight * 2, "kanit-32-thin", "TYPE YOUR NAME AND PRESS [ENTER]", 32)
+            .setOrigin(0.5, 0.5)
+
+        let nameText = this.add.bitmapText( screenWidth / 2, coords.getScreenFractionY(0.62), FONT, "", 72)
+            .setOrigin(0.5, 0.5)
+
+        this.layers.text.add([congratsText, messageText, scoreText, enterText, nameText])
+
+        this.texts.nameText = nameText
+
+        this.tweens.add({
+            targets: congratsText,
+            y: coords.getScreenFractionY(.10),
+            duration: 1000,
+            ease: 'Back',
+            easeParams: [ 0.5 ]
+        });
+
+        this.tweens.add({
+            targets: messageText,
+            x: coords.getScreenFractionX(.50),
+            duration: 1000,
+            ease: 'Back',
+            easeParams: [ 0.5 ],
+            delay: 1000
+        });
+
+        this.tweens.add({
+            targets: scoreText,
+            x: coords.getScreenFractionX(.50),
+            duration: 1000,
+            ease: 'Back',
+            easeParams: [ 0.5 ],
+            delay: 1000
+        });
+
+        this.tweens.add({
+            targets: enterText,
+            y: coords.getScreenFractionY(.50),
+            duration: 1000,
+            ease: 'Back',
+            easeParams: [ 0.5 ],
+            delay: 1000
+        });
+
+        let rect = this.add.rectangle(0, 0, screenWidth, screenHeight, 0x00000, 0.20)
+            .setOrigin(0, 0)
+        this.layers.mask.add(rect)
+
+        this.buildFireWorks()
+
+        // this.input.on('pointerup', function(pointer, localX, localY, event) {
+        //     this.nextScene()
+        // }, this)
+
+        this.input.keyboard.on('keydown', this.keyDown, this)
+
+        this.time.addEvent({
+            delay: 1000,
+            callback: function() {
+                this.temp.allowInput = true
+                this.temp.underscoreVisible = !this.temp.underscoreVisible
+            },
+            loop: true,
+            callbackScope: this
+        });
+
+    }
+
+    buildFireWorks() {
+
+        var sparks = [
+            this.add.particles('particle-red'),
+            this.add.particles('particle-green'),
+            this.add.particles('particle-blue'),
+            this.add.particles('particle-yellow'),
+            this.add.particles('particle-white')
+        ]
+
+        this.layers.fireworks.add(sparks)
+
+        for (let i = 0; i < 20; i++) {
+            var particles = sparks[i % sparks.length]
+
+            let emitter = particles.createEmitter({
+                x: globals.coords.getScreenFractionX(i/20),
+                y: globals.coords.getScreenFractionY(0.13),
+                speed: { min: -100, max: 500 },
+                gravityY: 100,
+                scale: { start: 0.4, end: 0.1 },
+                lifespan: 600,
+                blendMode: 'SCREEN'
+            })
 
         }
 
-
-        this.input.on('pointerup', function(pointer, localX, localY, event) {
-            this.nextScene()
-        }, this)
-
-        this.input.keyboard.on('keydown', function(pointer, localX, localY, event) {
-            this.nextScene()
-        }, this)
-
     }
 
+    congratulationsTextCallback(data) {
+        // https://www.color-hex.com/color-palette/109407
+        //let colors = [0x00aed9, 0x53da3f, 0xffe71a, 0xff983a, 0x000000, 0xff17a3]
+        let colors = globals.temp.rainbow
+
+        data.color = colors[ data.index % colors.length ].color
+
+        let degrees = rainbowWave + data.index * 15
+        degrees = degrees % 360
+
+        let radians = degrees * Math.PI / 180.0
+        data.y = data.y + Math.sin(radians) * 5;
+
+        rainbowWave += 1;
+        return data
+    }
+
+    keyDown(event) {
+        console.log(event.code + " - " + event.key)
+        if ((event.code == "Delete") || (event.code == "Backspace")) {
+            if (this.temp.name.length > 0) {
+                this.temp.name = this.temp.name.substring(0, this.temp.name.length - 1);
+            }
+            return
+        }
+
+        if ((event.code == "Enter") || (event.code == "Return")) {
+            if (this.temp.name.length > 0) {
+                this.temp.highScores.addHighScore(globals.state.score, this.temp.name)
+                //highScores.addHighScore(512000, this.temp.name)
+                this.nextScene()
+                return
+            }
+        }
+
+        let banned = ["\"", "'", ":"]
+        if (banned.indexOf(event.key) > -1) {
+            return
+        }
+
+        if ((event.key.length == 1) && (this.temp.name.length < 20)) {
+            this.temp.name = this.temp.name + event.key.toUpperCase()
+        }
+    }
+
+
     nextScene() {
-        // this.introMusic.stop();
-        this.scene.start('TitleScene');
-        // this.scene.start('TestScene');
+        this.scene.start('HighScoreScene');
+
     }
 
     update() {
-
+        if (this.temp.name.length == 0) {
+            if (this.temp.underscoreVisible) {
+                this.texts.nameText.setText(this.temp.name + "_")
+            }
+            else {
+                this.texts.nameText.setText(this.temp.name + " ")
+            }
+        }
+        else {
+            this.texts.nameText.setText(this.temp.name + "_")
+        }
     }
 
 }

@@ -12,12 +12,6 @@ class HighScoreScene extends Phaser.Scene {
 
         let highScores = new HighScores()
 
-        console.log("Testing score: ", globals.state.score)
-        if (highScores.isHighScore(globals.state.score)) {
-            console.log("High score!")
-            highScores.addHighScore(globals.state.score, "New Name")
-        }
-
         let screenWidth = globals.coords.screenWidth
         let screenHeight = globals.coords.screenHeight
 
