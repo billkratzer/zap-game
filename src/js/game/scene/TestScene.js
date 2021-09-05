@@ -45,8 +45,6 @@ class TestScene extends Phaser.Scene {
 
         this.layers.info.add([this.texts.title])
 
-        console.log('here')
-
         // Bottom Layer
         let playerRectBox = this.add.rectangle(
             this.coords.getScreenMiddleX(),
@@ -158,7 +156,6 @@ class TestScene extends Phaser.Scene {
         this.input.on('pointerdown', this.click, this);
 
         this.input.keyboard.on('keydown', function (event) {
-            console.log("input!")
             this.keyDown(event.code);
         }, this);
 

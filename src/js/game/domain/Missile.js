@@ -48,8 +48,6 @@ class Missile {
     }
 
     fire(fromX, fromY, toX, toY, startColor, endColor, explodingPieces, pieceToChange) {
-        // console.log("Firing missile from: " + fromX + "," + fromY + " to " + toX + "," + toY)
-
         if (this.firing) {
             return
         }

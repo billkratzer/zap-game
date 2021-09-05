@@ -197,7 +197,6 @@ class GameScene extends Phaser.Scene {
     }
 
     keyDown(code) {
-        // console.log(code)
         if (this.state.gameOverInputAllowed) {
             this.scene.start('NewHighScoreScene');
             return
