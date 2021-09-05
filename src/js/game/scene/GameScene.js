@@ -186,14 +186,13 @@ class GameScene extends Phaser.Scene {
     }
 
     keyDown(event) {
-        let code = event.code
         if (this.state.gameOverInputAllowed) {
             this.scene.start('NewHighScoreScene');
             return
         }
 
         if (globals.state.paused) {
-            switch (code) {
+            switch (event.code) {
                 case "Escape":
                     this.togglePause();
                     break;
@@ -206,7 +205,8 @@ class GameScene extends Phaser.Scene {
             return;
         }
 
-        switch (code) {
+        console.log(event.code)
+        switch (event.code) {
             case "Enter":
                 globals.state.forceGameOver()
                 globals.state.forcePaused()
@@ -214,13 +214,25 @@ class GameScene extends Phaser.Scene {
             case "ArrowLeft":
                 globals.state.player.move(Direction.LEFT, -1, 0)
                 break
+            case "KeyA":
+                globals.state.player.move(Direction.LEFT, -1, 0)
+                break
             case "ArrowRight":
+                globals.state.player.move(Direction.RIGHT, 1, 0)
+                break
+            case "KeyD":
                 globals.state.player.move(Direction.RIGHT, 1, 0)
                 break
             case "ArrowUp":
                 globals.state.player.move(Direction.UP, 0, -1)
                 break
+            case "KeyW":
+                globals.state.player.move(Direction.UP, 0, -1)
+                break
             case "ArrowDown":
+                globals.state.player.move(Direction.DOWN, 0, 1)
+                break
+            case "KeyS":
                 globals.state.player.move(Direction.DOWN, 0, 1)
                 break
             case "Backspace":
@@ -235,7 +247,7 @@ class GameScene extends Phaser.Scene {
         }
     }
 
-    click(pointer, localX, localY, event) {
+    click() {
         if (this.state.gameOverInputAllowed) {
             this.scene.start('NewHighScoreScene');
             return
