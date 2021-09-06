@@ -77,7 +77,7 @@ class GameState {
     }
 
     getRandomPieceType() {
-        let types = [ PieceType.BLUE, PieceType.GREEN, PieceType.ORANGE, PieceType.PURPLE ]
+        let types = [ PieceType.BLUE, PieceType.GREEN, PieceType.ORANGE, PieceType.PURPLE, PieceType.BOLT ]
 
         return types[ Math.floor( Math.random() * types.length)]
     }
@@ -186,20 +186,38 @@ class GameState {
         firingInfo.startColor = this.player.color
         firingInfo.endColor = this.player.color
 
+        let bolt = false
+
         while (!done) {
             if ( grid.inBounds(gx, gy) ) {
                 let piece = grid.getPieceAt(gx, gy)
                 if (piece) {
-                    if (piece.type === this.player.color) {
+                    if (bolt) {
                         firingInfo.explodingPieces.push(piece)
                         grid.setPieceAt(gx, gy, null)
                         gx = gx + dx
                         gy = gy + dy
                     }
                     else {
-                        firingInfo.endColor = piece.type
-                        firingInfo.pieceToChange = piece
-                        done = true
+                        if (piece.type === this.player.color) {
+                            firingInfo.explodingPieces.push(piece)
+                            grid.setPieceAt(gx, gy, null)
+                            gx = gx + dx
+                            gy = gy + dy
+                        }
+                        else if (piece.type === PieceType.BOLT) {
+                            bolt = true
+
+                            firingInfo.explodingPieces.push(piece)
+                            grid.setPieceAt(gx, gy, null)
+                            gx = gx + dx
+                            gy = gy + dy
+                        }
+                        else {
+                            firingInfo.endColor = piece.type
+                            firingInfo.pieceToChange = piece
+                            done = true
+                        }
                     }
                 }
                 else {
@@ -212,7 +230,10 @@ class GameState {
             }
         }
 
-        if ((firingInfo.explodingPieces.length == 0) && (firingInfo.startColor != firingInfo.endColor)) {
+        if (bolt) {
+            globals.soundfx.play("explosion-1")
+        }
+        else if ((firingInfo.explodingPieces.length == 0) && (firingInfo.startColor != firingInfo.endColor)) {
             globals.soundfx.play("ui-quirky-9")
         }
 

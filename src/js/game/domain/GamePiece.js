@@ -23,9 +23,23 @@ class GamePiece {
         this.exploding = false
 
         this.sprite = this.scene.add.sprite(0, 0, "sprites", 0).setScale(3).setOrigin(0.5, 0.5).setAlpha(0)
-        this.sprite.play("piece-" + this.type + "-facing-" + this.direction)
-        this.layer.add(this.sprite)
+        this.sprite.play(this.getSpriteFacingKey())
 
+        this.layer.add(this.sprite)
+    }
+
+    getSpriteFacingKey() {
+        if (this.type == PieceType.BOLT) {
+            return "bolt"
+        }
+        return "piece-" + this.type + "-facing-" + this.direction
+    }
+
+    getSpriteMovingKey() {
+        if (this.type == PieceType.BOLT) {
+            return "bolt"
+        }
+        return "piece-" + this.type + "-moving-" + this.direction
     }
 
     getType() {
@@ -57,14 +71,14 @@ class GamePiece {
             onComplete: this.endMoveSprite,
             onCompleteScope: this
         })
-        this.sprite.play("piece-" + this.type + "-moving-" + this.direction)
+        this.sprite.play(this.getSpriteMovingKey())
 
         this.moving = true
     }
 
     endMoveSprite() {
         if (this.sprite) {
-            this.sprite.play("piece-" + this.type + "-facing-" + this.direction)
+            this.sprite.play(this.getSpriteFacingKey())
         }
         this.moving = false
     }
@@ -137,7 +151,7 @@ class GamePiece {
 
     endSpriteShrink(tween, targets, color) {
         this.type = color
-        this.sprite.play("piece-" + this.type + "-facing-" + this.direction)
+        this.sprite.play(this.getSpriteFacingKey())
 
         this.scene.tweens.add({
             targets: this.sprite,

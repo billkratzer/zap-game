@@ -98,6 +98,7 @@ class LoadScene extends Phaser.Scene {
         this.loadMusic("desert-mayhem")
         this.loadMusic("funky-runnin")
 
+        this.loadFx("explosion-1")
         this.loadFx("ui-quirky-9")
         this.loadFx("ui-quirky-31")
         this.loadFx("ui-quirky-33")
