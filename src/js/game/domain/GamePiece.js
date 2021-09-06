@@ -36,8 +36,8 @@ class GamePiece {
         this.y = y
         let boardPos = this.grid.fromGridPosToBoardPos(this.x, this.y)
         this.sprite.setPosition(
-            globals.coords.boardXToScreenX(boardPos.x),
-            globals.coords.boardYToScreenY(boardPos.y)
+            globals.coords.boardXToScreenX(boardPos.x) + 6,
+            globals.coords.boardYToScreenY(boardPos.y) + 3
         )
     }
 
@@ -49,8 +49,8 @@ class GamePiece {
 
         this.scene.tweens.add({
             targets: this.sprite,
-            x: globals.coords.boardXToScreenX(boardPos.x),
-            y: globals.coords.boardYToScreenY(boardPos.y),
+            x: globals.coords.boardXToScreenX(boardPos.x) + 6,
+            y: globals.coords.boardYToScreenY(boardPos.y) + 3,
             duration: 500,
             delay: 0,
             onComplete: this.endMoveSprite,
@@ -71,7 +71,7 @@ class GamePiece {
             targets: this.sprite,
             alpha: 1,
             duration: 500,
-            delay: 500,
+            delay: 0,
             onComplete: this.endFadeIn,
             onCompleteScope: this
         })

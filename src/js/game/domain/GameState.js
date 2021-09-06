@@ -37,6 +37,7 @@ class GameState {
 
         this.player = new Player(PlayerColor.GREEN, this.playerBounds)
         this.missile = new Missile()
+        this.nextPieceIndicator = new NextPieceIndicator()
     }
 
     forcePaused() {
@@ -47,10 +48,28 @@ class GameState {
         this.paused = !this.paused
     }
 
-    addNewPiece(scene, layer) {
+    initNextPiece() {
         let type = this.getRandomPieceType()
-        this.selectRandomGrid().addNewPiece(type, scene, layer)
+        let grid = this.selectRandomGrid()
+        let gridPos = grid.getNewPiecePos()
 
+        let indicator = this.nextPieceIndicator
+
+        indicator.setNextPiece(type, grid, gridPos.x, gridPos.y)
+        indicator.updatePosition()
+    }
+
+    addNewPiece(scene, layer) {
+        // let type = this.getRandomPieceType()
+        // this.selectRandomGrid().addNewPiece(type, scene, layer)
+
+        let type = this.nextPieceIndicator.getType()
+        let grid = this.nextPieceIndicator.getGrid()
+        let gridPos = this.nextPieceIndicator.getGridPos()
+
+        grid.addNewPieceAt(type, gridPos.x, gridPos.y, scene, layer)
+
+        this.initNextPiece()
     }
 
     selectRandomGrid() {

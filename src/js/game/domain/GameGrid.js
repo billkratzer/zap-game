@@ -95,6 +95,110 @@ class GameGrid {
         return Math.floor(Math.random() * upper);
     }
 
+    getNewPiecePos() {
+        switch (this.side) {
+            case Side.TOP:
+                return {
+                    x: this.randomInt(this.width),
+                    y: 0
+                }
+            case Side.BOTTOM:
+                return {
+                    x: this.randomInt(this.width),
+                    y: this.height - 1
+                }
+            case Side.LEFT:
+                return {
+                    x: 0,
+                    y: this.randomInt(this.height)
+                }
+            case Side.RIGHT:
+                return {
+                    x: this.width - 1,
+                    y: this.randomInt(this.height)
+                }
+            default:
+                throw new Error("Invalid value for side: " + this.side)
+        }
+    }
+
+    addNewPieceAt(type, gx, gy, scene, layer) {
+        let x = gx
+        let y = gy
+        var shiftX = 0
+        var shiftY = 0
+
+        if (!this.side) {
+            throw new Error("Side is not defined!")
+        }
+
+        let facing = ""
+        switch (this.side) {
+            case Side.TOP:
+                shiftX = 0
+                shiftY = 1
+                facing = Direction.DOWN
+                break
+            case Side.BOTTOM:
+                shiftX = 0
+                shiftY = -1
+                facing = Direction.UP
+                break
+            case Side.LEFT:
+                shiftX = 1
+                shiftY = 0
+                facing = Direction.RIGHT
+                break
+            case Side.RIGHT:
+                facing = Direction.LEFT
+                shiftX = -1
+                break
+            default:
+                throw new Error("Invalid value for side: " + this.side)
+        }
+
+        let newPiece = new GamePiece(type, facing, this, scene, layer)
+        newPiece.setPosition(x, y)
+        newPiece.fadeIn()
+
+        let movingPieces = []
+
+        let done = false
+        while ( !done ) {
+            let piece = this.getPieceAt(x, y)
+            this.setPieceAt(x, y, null)
+            if ( piece ) {
+                x = x + shiftX
+                y = y + shiftY
+                piece.moveToPosition(x, y, facing)
+                movingPieces.push(piece)
+            }
+            else {
+                done = true
+            }
+            if (( x < 0 ) || ( x >= this.width )) {
+                this.overflow = true
+                done = true
+            }
+            if (( y < 0 ) || ( y >= this.height )) {
+                this.overflow = true
+                done = true
+            }
+        }
+        if (this.overflow) {
+            return
+        }
+
+        for (var i = 0; i < movingPieces.length; i++) {
+            let piece = movingPieces[i]
+            this.setPieceAt(piece.x, piece.y, piece)
+        }
+
+        this.setPieceAt(newPiece.x, newPiece.y, newPiece)
+
+        return newPiece
+    }
+
     addNewPiece(type, scene, layer) {
         var x = 0
         var y = 0

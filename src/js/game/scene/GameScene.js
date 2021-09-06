@@ -38,7 +38,8 @@ class GameScene extends Phaser.Scene {
         this.layers.dots = this.add.layer().setDepth(1)
         this.layers.missile = this.add.layer().setDepth(2)
         this.layers.player = this.add.layer().setDepth(3)
-        this.layers.pieces = this.add.layer().setDepth(4)
+        this.layers.indicator = this.add.layer().setDepth(4)
+        this.layers.pieces = this.add.layer().setDepth(5)
         this.layers.info = this.add.layer().setDepth(10)
 
         let coords = globals.coords
@@ -106,6 +107,9 @@ class GameScene extends Phaser.Scene {
         // Missile Layer
         globals.state.missile.buildSprite(this, this.layers.missile)
 
+        // Next Piece Indicator
+        globals.state.nextPieceIndicator.buildSprite(this, this.layers.indicator)
+        globals.state.initNextPiece()
 
         // Events
         this.input.on('pointerdown', this.click, this);

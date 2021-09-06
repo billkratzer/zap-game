@@ -25,6 +25,17 @@ class AnimationFactory {
         this.buildExplosionForColor(PieceType.BLUE, 1 * 16 + 5)
         this.buildExplosionForColor(PieceType.ORANGE, 2 * 16 + 5)
         this.buildExplosionForColor(PieceType.PURPLE, 3 * 16 + 5)
+
+        this.buildNextPieceIndicator()
+    }
+
+    buildNextPieceIndicator() {
+        this.scene.anims.create({
+            key: "next-piece-indicator",
+            frames: this.scene.anims.generateFrameNumbers('sprites-2', { frames: this.range(11 * 8, 4) }),
+            frameRate: 8,
+            repeat: -1
+        });
     }
 
     buildExplosionForColor(color, offset) {
