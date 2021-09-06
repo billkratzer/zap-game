@@ -62,7 +62,9 @@ class GamePiece {
     }
 
     endMoveSprite() {
-        this.sprite.play("piece-" + this.type + "-facing-" + this.direction)
+        if (this.sprite) {
+            this.sprite.play("piece-" + this.type + "-facing-" + this.direction)
+        }
         this.moving = false
     }
 
@@ -79,18 +81,22 @@ class GamePiece {
 
     explode(points) {
         this.exploding = true
-        this.sprite.play("explosion-" + this.type)
-        this.scene.tweens.add({
-            targets: this.sprite,
-            scale: 0.5,
-            duration: 500,
-        })
 
-        this.scene.time.addEvent({
-            delay: 200,
-            callback: this.startFade,
-            callbackScope: this,
-        })
+        if (this.sprite) {
+            this.sprite.play("explosion-" + this.type)
+            this.scene.tweens.add({
+                targets: this.sprite,
+                scale: 0.5,
+                duration: 500,
+            })
+
+            this.scene.time.addEvent({
+                delay: 200,
+                callback: this.startFade,
+                callbackScope: this,
+            })
+        }
+
 
         let boardPos = this.grid.fromGridPosToBoardPos(this.x, this.y)
         let pts = new Points(points, boardPos.x, boardPos.y)
@@ -110,20 +116,20 @@ class GamePiece {
 
     endFade() {
         this.sprite.destroy()
-        // this.sprite = null
     }
 
     changeColor(color) {
-
-        this.scene.tweens.add({
-            targets: this.sprite,
-            scale: 1,
-            duration: 100,
-            delay: 0,
-            onComplete: this.endSpriteShrink,
-            onCompleteScope: this,
-            onCompleteParams: [ color ]
-        })
+        if (this.sprite) {
+            this.scene.tweens.add({
+                targets: this.sprite,
+                scale: 1,
+                duration: 100,
+                delay: 0,
+                onComplete: this.endSpriteShrink,
+                onCompleteScope: this,
+                onCompleteParams: [ color ]
+            })
+        }
     }
 
     endSpriteShrink(tween, targets, color) {
