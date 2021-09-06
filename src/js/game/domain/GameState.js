@@ -213,7 +213,7 @@ class GameState {
             }
         }
 
-        if (firingInfo.explodingPieces.length == 0) {
+        if ((firingInfo.explodingPieces.length == 0) && (firingInfo.startColor != firingInfo.endColor)) {
             globals.soundfx.play("ui-quirky-9")
         }
 
