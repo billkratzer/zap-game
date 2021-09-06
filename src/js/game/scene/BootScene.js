@@ -5,11 +5,8 @@ class BootScene extends Phaser.Scene {
         console.log("Phaser Version: " + Phaser.VERSION);
     }
 
-    loadAudio(name) {
-        // return this.load.audio(name, [
-        //     "/assets/audio/" + name + ".ogg",
-        //     "/assets/audio/" + name + ".mp3"
-        // ]);
+    loadMusic(name) {
+        return this.load.audio("music-" + name, "asset/audio/music/" + name + ".mp3")
     }
 
     loadFont(name) {
@@ -63,6 +60,13 @@ class BootScene extends Phaser.Scene {
         this.loadParticleImage("blue")
         this.loadParticleImage("white")
         this.loadParticleImage("yellow")
+
+        // Music
+        this.loadMusic("cool-puzzler")
+        this.loadMusic("desert-mayhem")
+        this.loadMusic("funky-runnin")
+
+        globals.music = new MusicBox()
     }
 
     create () {
@@ -82,7 +86,6 @@ class BootScene extends Phaser.Scene {
     }
 
     update() {
-
     }
 
 }

@@ -154,6 +154,8 @@ class GameScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown', this.keyDown, this);
 
+        // Music
+        globals.music.play("desert-mayhem")
 
         this.initLevelTimer()
         this.initNewPieceTimer()
@@ -232,7 +234,7 @@ class GameScene extends Phaser.Scene {
 
     keyDown(event) {
         if (this.state.gameOverInputAllowed) {
-            this.scene.start('NewHighScoreScene');
+            this.nextScene()
             return
         }
 
@@ -242,9 +244,8 @@ class GameScene extends Phaser.Scene {
                     this.togglePause();
                     break;
                 case "KeyQ":
-                    if (globals.state.paused) {
-                        this.quit();
-                    }
+                    console.log("QUITTTING!")
+                    this.quit();
                     break;
             }
             return;
@@ -294,7 +295,7 @@ class GameScene extends Phaser.Scene {
 
     click() {
         if (this.state.gameOverInputAllowed) {
-            this.scene.start('NewHighScoreScene');
+            this.nextScene()
             return
         }
         if (this.counts.gameOver > 0) {
@@ -394,6 +395,8 @@ class GameScene extends Phaser.Scene {
     }
 
     gameOver() {
+        globals.music.play("cool-puzzler")
+
         globals.state.forcePaused()
 
         this.layers.gameOver = this.add.layer().setDepth(2000)
@@ -456,6 +459,10 @@ class GameScene extends Phaser.Scene {
 
         rainbowWave += 1;
         return data
+    }
+
+    nextScene() {
+        this.scene.start('NewHighScoreScene')
     }
 
     update() {

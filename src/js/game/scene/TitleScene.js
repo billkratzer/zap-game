@@ -54,10 +54,11 @@ class TitleScene extends Phaser.Scene {
             this.nextScene();
         }, this);
 
+        globals.music.play("funky-runnin")
     }
 
     nextScene() {
-        // this.introMusic.stop();
+        //this.music.stop()
         this.scene.start('GameScene');
         // this.scene.start('TestScene');
     }
