@@ -74,8 +74,8 @@ class BootScene extends Phaser.Scene {
 
         // this.scene.start('GameScene');
         // this.scene.start('NewHighScoreScene');
-        this.scene.start('TestScene');
-        // this.scene.start('TitleScene');
+        // this.scene.start('TestScene');
+        this.scene.start('TitleScene');
     }
 
     update() {
