@@ -398,7 +398,7 @@ class GameScene extends Phaser.Scene {
             .setOrigin(0, 0)
             .setAlpha(0.85)
 
-        const FONT = 'game-over-font'
+        const FONT = 'kanit-96-glow'
         let text1 = this.add.dynamicBitmapText(width / 2, 0 - height, FONT, "GAME OVER", 96)
             .setOrigin(0.5, 0.5)
             .setDisplayCallback(this.gameOverTextCallback);
