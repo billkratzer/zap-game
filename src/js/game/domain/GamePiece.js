@@ -26,6 +26,20 @@ class GamePiece {
         this.sprite.play(this.getSpriteFacingKey())
 
         this.layer.add(this.sprite)
+
+        // add the "pulsing" effect
+        let scaleTarget = 0.80 * this.sprite.scale
+
+        if (this.type == PieceType.BOLT) {
+            this.scene.tweens.add({
+                targets: this.sprite,
+                scaleX: scaleTarget,
+                scaleY: scaleTarget,
+                yoyo: true,
+                repeat: 10,
+                duration: 500
+            })
+        }
     }
 
     getSpriteFacingKey() {
