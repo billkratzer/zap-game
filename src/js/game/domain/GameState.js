@@ -200,7 +200,6 @@ class GameState {
                         firingInfo.endColor = piece.type
                         firingInfo.pieceToChange = piece
                         done = true
-
                     }
                 }
                 else {
