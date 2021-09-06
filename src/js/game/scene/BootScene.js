@@ -47,6 +47,9 @@ class BootScene extends Phaser.Scene {
         this.load.spritesheet("sprites-2", "./asset/image/sprite-sheet-2.png",
             { frameWidth: 16, frameHeight: 16 }
         )
+        this.load.spritesheet("sprites-3", "./asset/image/sprite-sheet-3.png",
+            { frameWidth: 16, frameHeight: 16 }
+        )
 
         // Images
         this.loadImage("zap-title-text")
@@ -71,8 +74,8 @@ class BootScene extends Phaser.Scene {
 
         // this.scene.start('GameScene');
         // this.scene.start('NewHighScoreScene');
-        //this.scene.start('HighScoreScene');
-         this.scene.start('TitleScene');
+        this.scene.start('TestScene');
+        // this.scene.start('TitleScene');
     }
 
     update() {

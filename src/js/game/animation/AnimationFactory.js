@@ -27,6 +27,35 @@ class AnimationFactory {
         this.buildExplosionForColor(PieceType.PURPLE, 3 * 16 + 5)
 
         this.buildNextPieceIndicator()
+
+        this.buildExtraPieceAnimations()
+    }
+
+    buildExtraPieceAnimations() {
+        this.scene.anims.create({
+            key: "bomb",
+            frames: this.scene.anims.generateFrameNumbers('sprites-3', { frames: this.range(0, 1) }),
+            frameRate: 1,
+            repeat: 0
+        });
+        this.scene.anims.create({
+            key: "bolt",
+            frames: this.scene.anims.generateFrameNumbers('sprites-3', { frames: this.range(10, 1) }),
+            frameRate: 1,
+            repeat: 0
+        });
+        this.scene.anims.create({
+            key: "present",
+            frames: this.scene.anims.generateFrameNumbers('sprites-3', { frames: this.range(20, 1) }),
+            frameRate: 1,
+            repeat: 0
+        });
+        this.scene.anims.create({
+            key: "heart",
+            frames: this.scene.anims.generateFrameNumbers('sprites-3', { frames: this.range(30, 9) }),
+            frameRate: 9,
+            repeat: -1
+        });
     }
 
     buildNextPieceIndicator() {
