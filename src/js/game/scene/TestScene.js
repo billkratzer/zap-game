@@ -122,6 +122,44 @@ class TestScene extends Phaser.Scene {
         this.sprites.player.play("heart")
         this.layers.player.add(this.sprites.player)
 
+
+        this.sprites.fireVertical = this.add.sprite(
+            this.coords.boardXToScreenX(1),
+            this.coords.boardYToScreenY(8),
+            "vertical-fire",
+            0)
+            .setTint(0xff4444)
+
+        this.sprites.fireVertical.displayWidth = 16
+
+        this.tweens.add({
+            targets:  this.sprites.fireVertical,
+            displayHeight: 50,
+            duration: 5000,
+            ease: 'Back',
+            easeParams: [ 3.5 ],
+            delay: 100
+        });
+
+        this.sprites.fireHorizontal = this.add.sprite(
+            this.coords.boardXToScreenX(1),
+            this.coords.boardYToScreenY(4),
+            "horizontal-fire",
+            0)
+            .setTint(0xff4444)
+            .setOrigin(0, 0)
+
+        this.sprites.fireHorizontal.displayHeight = 16
+
+        this.tweens.add({
+            targets:  this.sprites.fireHorizontal,
+            displayWidth: 50,
+            duration: 5000,
+            ease: 'Back',
+            easeParams: [ 3.5 ],
+            delay: 100
+        });
+
         //this.spriteIndex = 0
 
         // Piece Layer

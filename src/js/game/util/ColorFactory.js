@@ -39,6 +39,10 @@ class ColorFactory {
             pit3: this.colorFromHex("#ff88ff"),
             pit4: this.colorFromHex("#ffbbff"),
             text: this.colorFromHex("#fff"),
+            piece1: this.colorFromHex("#52d93f"),
+            piece2: this.colorFromHex("#6cc5ce"),
+            piece3: this.colorFromHex("#ff983a"),
+            piece4: this.colorFromHex("#6638f0")
         })
     }
 

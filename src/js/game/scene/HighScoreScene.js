@@ -90,7 +90,7 @@ class HighScoreScene extends Phaser.Scene {
 
         y = y + 48
 
-        // 10 highscroe lines
+        // 10 high score lines
         let scoreTint = Phaser.Display.Color.HexStringToColor("#D4AC0D")
 
         let scoreTints = []

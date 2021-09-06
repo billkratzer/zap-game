@@ -1,4 +1,7 @@
+const MISSILE_THICKNESS = 20
+
 class Missile {
+
 
     constructor() {
         this.color = PlayerColor.GREEN
@@ -7,22 +10,34 @@ class Missile {
         this.direction = Direction.UP
 
         this.firing = false
+
+        this.shimmer = {
+            width: false,
+            height: false
+        }
+
+        this.colors = []
+
+        this.updateTick = 0
     }
 
     buildSprite(scene, layer) {
         this.scene = scene
         this.layer = layer
 
-        this.rect = this.scene.add.rectangle(
-            0,
-            0,
-            0,
-            0,
-            0x00ff00)
-            .setOrigin(0, 0)
-            .setAlpha(0.50)
+        // sprite creation will be defered until we know what direction we are firing!
 
-        this.layer.add(this.rect)
+        // this.rect = this.scene.add.rectangle(
+        //     0,
+        //     0,
+        //     0,
+        //     0,
+        //     0x00ff00)
+        //     .setOrigin(0, 0)
+        //     .setAlpha(0.50)
+
+
+        // this.layer.add(this.rect)
     }
 
     toHexColor(color) {
@@ -47,10 +62,37 @@ class Missile {
         return 0xffffff
     }
 
+    getTint() {
+        let theme = globals.colors.getTheme("default")
+        switch (this.color) {
+            case PlayerColor.GREEN:
+                return theme.piece1
+            case PlayerColor.BLUE:
+                return theme.piece2
+            case PlayerColor.ORANGE:
+                return theme.piece3
+            case PlayerColor.PURPLE:
+                return theme.piece4
+        }
+    }
+
+    computeColors() {
+        this.colors = []
+
+        let color = this.getTint()
+        for (let i = 0; i < 10; i++) {
+            this.colors.push(color)
+            color = color.clone().lighten(8)
+        }
+    }
+
     fire(fromX, fromY, toX, toY, startColor, endColor, explodingPieces, pieceToChange) {
         if (this.firing) {
             return
         }
+
+        this.color = startColor
+        this.computeColors()
 
         this.firing = true
         let length = 0
@@ -83,89 +125,65 @@ class Missile {
         let destWidth = 0
         let destHeight = 0
 
-        let bounceDestWidth = 0
-        let bounceDestHeight = 0
-
-        let toScreenX = fromScreenX
-        let toScreenY = fromScreenY
-
+        // build the sprite
         switch (this.direction) {
             case Direction.UP:
-                this.rect.width = globals.coords.boardXUnits(0.5)
-                this.rect.height = 0
-                destWidth = globals.coords.boardXUnits(0.5)
+                this.sprite = this.scene.add.sprite(fromScreenX, fromScreenY, "vertical-fire", 0)
+                    .setOrigin(0.5, 1)
+                this.sprite.displayWidth = MISSILE_THICKNESS
+                this.sprite.displayHeight = 0
+                destWidth = MISSILE_THICKNESS
                 destHeight = globals.coords.boardYUnits(length)
-                toScreenY = fromScreenY - destHeight
-
-                fromScreenX = fromScreenX - globals.coords.boardXUnits(0.25)
-                toScreenX = toScreenX - globals.coords.boardXUnits(0.25)
-
-                bounceDestWidth = destWidth
-                bounceDestHeight = 0
+                this.shimmer.width = true
                 break;
             case Direction.DOWN:
-                this.rect.width = globals.coords.boardXUnits(0.5)
-                this.rect.height = 0
-                destWidth = globals.coords.boardXUnits(0.5)
+                this.sprite = this.scene.add.sprite(fromScreenX, fromScreenY, "vertical-fire", 0)
+                    .setOrigin(0.5, 0)
+                this.sprite.displayWidth = MISSILE_THICKNESS
+                this.sprite.displayHeight = 0
+                destWidth = MISSILE_THICKNESS
                 destHeight = globals.coords.boardYUnits(length)
-
-                fromScreenX = fromScreenX - globals.coords.boardXUnits(0.25)
-                toScreenX = toScreenX - globals.coords.boardXUnits(0.25)
-
-                bounceDestWidth = destWidth
-                bounceDestHeight = 0
+                this.shimmer.width = true
                 break;
             case Direction.LEFT:
-                this.rect.width = 0
-                this.rect.height = globals.coords.boardYUnits(0.5)
+                this.sprite = this.scene.add.sprite(fromScreenX, fromScreenY, "horizontal-fire", 0)
+                    .setOrigin(1, 0.5)
+                this.sprite.displayWidth = 0
+                this.sprite.displayHeight = MISSILE_THICKNESS
                 destWidth = globals.coords.boardXUnits(length)
-                destHeight = globals.coords.boardYUnits(0.5)
-                toScreenX = fromScreenX - destWidth
-
-                fromScreenY = fromScreenY - globals.coords.boardYUnits(0.25)
-                toScreenY = toScreenY - globals.coords.boardYUnits(0.25)
-
-                bounceDestWidth = 0
-                bounceDestHeight = destHeight
+                destHeight = MISSILE_THICKNESS
+                this.shimmer.height = true
                 break;
             case Direction.RIGHT:
-                this.rect.width = 0
-                this.rect.height = globals.coords.boardYUnits(0.5)
+                this.sprite = this.scene.add.sprite(fromScreenX, fromScreenY, "horizontal-fire", 0)
+                    .setOrigin(0, 0.5)
+                this.sprite.displayWidth = 0
+                this.sprite.displayHeight = MISSILE_THICKNESS
                 destWidth = globals.coords.boardXUnits(length)
-                destHeight = globals.coords.boardYUnits(0.5)
-
-                fromScreenY = fromScreenY - globals.coords.boardYUnits(0.25)
-                toScreenY = toScreenY - globals.coords.boardYUnits(0.25)
-
-                bounceDestWidth = 0
-                bounceDestHeight = destHeight
+                destHeight = MISSILE_THICKNESS
+                this.shimmer.height = true
                 break;
         }
+        this.layer.add(this.sprite)
 
-        let bounceToScreenX = fromScreenX
-        let bounceToScreenY = fromScreenY
+        this.sprite.setTint(this.getTint().color)
+        this.sprite.setPosition(fromScreenX, fromScreenY)
 
-
-        this.rect.setOrigin(0, 0)
-        this.rect.setPosition(fromScreenX, fromScreenY)
-        this.rect.fillColor = this.toHexColor(startColor)
+        let bounceDestWidth = this.sprite.displayWidth
+        let bounceDestHeight =this.sprite.displayHeight
 
         const TWEEN_MILLIS = 100
         this.scene.tweens.add({
-            targets: this.rect,
-            x: toScreenX,
-            y: toScreenY,
-            width: destWidth,
-            height: destHeight,
+            targets: this.sprite,
+            displayWidth: destWidth,
+            displayHeight: destHeight,
             duration: TWEEN_MILLIS,
             onComplete: this.bounce,
             onCompleteScope: this,
             onCompleteParams: [
-                bounceToScreenX,
-                bounceToScreenY,
-                bounceDestWidth,
-                bounceDestHeight,
-                endColor,
+                 bounceDestWidth,
+                 bounceDestHeight,
+                 endColor
             ]
         })
 
@@ -209,15 +227,16 @@ class Missile {
 
     }
 
-    bounce(tween, target, destX, destY, destWidth, destHeight, newColor) {
-        this.rect.fillColor = this.toHexColor(newColor)
+    bounce(tween, target, destWidth, destHeight, newColor) {
+        this.color = newColor
+        this.computeColors()
+
+        this.sprite.setTint(this.getTint().color)
 
         this.scene.tweens.add({
-            targets: this.rect,
-            x: destX,
-            y: destY,
-            width: destWidth,
-            height: destHeight,
+            targets: this.sprite,
+            displayWidth: destWidth,
+            displayHeight: destHeight,
             duration: 100,
             onComplete: this.endFire,
             onCompleteScope: this,
@@ -233,9 +252,11 @@ class Missile {
 
         this.firing = false
 
-        if (this.rect) {
-            this.rect.width = 0
-            this.rect.height = 0
+        this.shimmer.width = false
+        this.shimmer.height = false
+
+        if (this.sprite) {
+            this.sprite.destroy()
         }
     }
 
@@ -248,6 +269,20 @@ class Missile {
         return {
             x: this.x,
             y: this.y
+        }
+    }
+
+    update() {
+
+        if (this.shimmer.width) {
+            this.sprite.displayWidth = Phaser.Math.Between(MISSILE_THICKNESS - 5, MISSILE_THICKNESS + 5)
+            this.sprite.setTint(this.colors[this.updateTick % this.colors.length].color)
+            this.updateTick++
+        }
+        if (this.shimmer.height) {
+            this.sprite.displayHeight = Phaser.Math.Between(MISSILE_THICKNESS - 5, MISSILE_THICKNESS + 5)
+            this.sprite.setTint(this.colors[this.updateTick % this.colors.length].color)
+            this.updateTick++
         }
     }
 

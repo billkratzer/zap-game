@@ -54,6 +54,9 @@ class BootScene extends Phaser.Scene {
         // Images
         this.loadImage("zap-title-text")
 
+        this.loadImage("vertical-fire")
+        this.loadImage("horizontal-fire")
+
         // Particle Images
         this.loadParticleImage("red")
         this.loadParticleImage("green")

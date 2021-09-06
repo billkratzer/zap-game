@@ -472,6 +472,10 @@ class GameScene extends Phaser.Scene {
             }
             this.counts.gameOver++
         }
+
+        if (globals.state.missile) {
+            globals.state.missile.update()
+        }
     }
 
 }
