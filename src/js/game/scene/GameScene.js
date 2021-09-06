@@ -30,9 +30,7 @@ class GameScene extends Phaser.Scene {
 
 
     create () {
-
-        let camera = this.cameras.main
-            camera.setBackgroundColor(this.theme.background)
+        this.cameras.main.setBackgroundColor(this.theme.background)
 
         this.layers.bottom = this.add.layer().setDepth(0)
         this.layers.dots = this.add.layer().setDepth(1)
@@ -137,11 +135,10 @@ class GameScene extends Phaser.Scene {
         globals.state.initNextPiece()
 
         // Camera Zoom in effect
-        console.log(camera.zoom)
-        camera.zoom = 10
+        this.cameras.main.zoom = 10
 
         this.tweens.add({
-            targets: camera,
+            targets: this.cameras.main,
             zoom: 1,
             duration: 1000,
             ease: 'Back',
