@@ -5,82 +5,15 @@ class BootScene extends Phaser.Scene {
         console.log("Phaser Version: " + Phaser.VERSION);
     }
 
-    loadMusic(name) {
-        return this.load.audio("music-" + name, "asset/audio/music/" + name + ".mp3")
+    preload() {
+        this.splash = this.add.image("splash.png")
     }
 
-    loadFx(name) {
-        return this.load.audio("fx-" + name, "asset/audio/fx/" + name + ".mp3")
-    }
-
-    loadFont(name) {
-        return this.load.bitmapFont(name,
-            "./asset/font/" + name + ".png",
-            "./asset/font/" + name + ".xml"
-        );
-    }
-
-    loadImage(name) {
-        return this.load.image(name, "./asset/image/" + name + ".png")
-    }
-
-    loadParticleImage(name) {
-        return this.load.image("particle-" + name, "./asset/image/particle/" + name + ".png")
-    }
-
-    preload () {
-
-        // Fonts
-        this.loadFont("points-font")
-        this.loadFont("game-font")
-        this.loadFont("game-over-font")
-        this.loadFont("helvetica-neue-white-32")
-        this.loadFont("helvetica-neue-thin-gray-24")
-        this.loadFont("kanit-32-thin")
-        this.loadFont("kanit-32-medium")
-        this.loadFont("kanit-64-semibold")
-        this.loadFont("kanit-96-glow")
-
-        // Sprites
-        this.load.spritesheet("sprites-1", "./asset/image/sprite-sheet-1.png",
-            { frameWidth: 16, frameHeight: 16 }
-        )
-        this.load.spritesheet("sprites-2", "./asset/image/sprite-sheet-2.png",
-            { frameWidth: 16, frameHeight: 16 }
-        )
-        this.load.spritesheet("sprites-3", "./asset/image/sprite-sheet-3.png",
-            { frameWidth: 16, frameHeight: 16 }
-        )
-
-        // Images
-        this.loadImage("zap-title-text")
-
-        this.loadImage("vertical-fire")
-        this.loadImage("horizontal-fire")
-
-        // Particle Images
-        this.loadParticleImage("red")
-        this.loadParticleImage("green")
-        this.loadParticleImage("blue")
-        this.loadParticleImage("white")
-        this.loadParticleImage("yellow")
-
-        // Music
-        this.loadMusic("cool-puzzler")
-        this.loadMusic("desert-mayhem")
-        this.loadMusic("funky-runnin")
-
-        this.loadFx("ui-quirky-9")
-        this.loadFx("ui-quirky-31")
-        this.loadFx("ui-quirky-33")
-
-        globals.music = new MusicBox()
-        globals.soundfx = new SoundFx()
-    }
 
     create () {
-
         let camera = this.cameras.main
+
+
 
         globals.state = new GameState()
         globals.coords = new ScreenCoords(camera.width, camera.height, globals.state.BOARD_WIDTH, globals.state.BOARD_HEIGHT)
@@ -88,10 +21,10 @@ class BootScene extends Phaser.Scene {
 
         globals.temp = {}
 
-        // this.scene.start('GameScene');
-        // this.scene.start('NewHighScoreScene');
-        // this.scene.start('TestScene');
-        this.scene.start('TitleScene');
+        globals.music = new MusicBox()
+        globals.soundfx = new SoundFx()
+
+        this.scene.start('LoadScene');
     }
 
     update() {

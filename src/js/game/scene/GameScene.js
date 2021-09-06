@@ -32,7 +32,7 @@ class GameScene extends Phaser.Scene {
     create () {
 
         let camera = this.cameras.main
-        camera.setBackgroundColor(this.theme.background)
+            camera.setBackgroundColor(this.theme.background)
 
         this.layers.bottom = this.add.layer().setDepth(0)
         this.layers.dots = this.add.layer().setDepth(1)
