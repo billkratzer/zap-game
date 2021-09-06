@@ -34,7 +34,10 @@ class ColorFactory {
         this.buildTheme("default", {
             background: this.colorFromHex("#333"),
             dots: this.colorFromHex("#fff"),
-            pit: this.colorFromHex("#ff00ff"),
+            pit1: this.colorFromHex("#ff00ff"),
+            pit2: this.colorFromHex("#ff44ff"),
+            pit3: this.colorFromHex("#ff88ff"),
+            pit4: this.colorFromHex("#ffbbff"),
             text: this.colorFromHex("#fff"),
         })
     }

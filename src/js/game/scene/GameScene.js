@@ -66,14 +66,39 @@ class GameScene extends Phaser.Scene {
 
 
         // Bottom Layer
-        let playerRectBox = this.add.rectangle(
-            coords.getScreenMiddleX(),
-            coords.getScreenMiddleY(),
-            coords.boardXUnits(4),
-            coords.boardYUnits(4),
-            this.theme.pit.color)
+        let playerRectBox1 = this.add.rectangle(
+            coords.screenWidth / 2 - coords.boardXUnits(1),
+            coords.screenHeight / 2 - coords.boardYUnits(1),
+            coords.boardXUnits(2),
+            coords.boardYUnits(2),
+            this.theme.pit1.color)
             .setOrigin(0.5, 0.5)
-        this.layers.bottom.add(playerRectBox)
+
+        let playerRectBox2 = this.add.rectangle(
+            coords.screenWidth / 2 + coords.boardXUnits(1),
+            coords.screenHeight / 2 - coords.boardYUnits(1),
+            coords.boardXUnits(2),
+            coords.boardYUnits(2),
+            this.theme.pit2.color)
+            .setOrigin(0.5, 0.5)
+
+        let playerRectBox3 = this.add.rectangle(
+            coords.screenWidth / 2 - coords.boardXUnits(1),
+            coords.screenHeight / 2 + coords.boardYUnits(1),
+            coords.boardXUnits(2),
+            coords.boardYUnits(2),
+            this.theme.pit3.color)
+            .setOrigin(0.5, 0.5)
+
+        let playerRectBox4 = this.add.rectangle(
+            coords.screenWidth / 2 + coords.boardXUnits(1),
+            coords.screenHeight / 2 + coords.boardYUnits(1),
+            coords.boardXUnits(2),
+            coords.boardYUnits(2),
+            this.theme.pit4.color)
+            .setOrigin(0.5, 0.5)
+
+        this.layers.bottom.add(playerRectBox1, playerRectBox2, playerRectBox3, playerRectBox4)
 
 
         // Dots Layer
