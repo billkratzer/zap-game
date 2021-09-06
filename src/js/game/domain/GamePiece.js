@@ -4,7 +4,8 @@ const PieceType = {
     ORANGE: "orange",
     PURPLE: "purple",
     BOMB: "bomb",
-    BOLT: "bolt"
+    BOLT: "bolt",
+    SURPRISE: "surprise"
 }
 
 class GamePiece {
