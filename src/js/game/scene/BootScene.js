@@ -9,6 +9,10 @@ class BootScene extends Phaser.Scene {
         return this.load.audio("music-" + name, "asset/audio/music/" + name + ".mp3")
     }
 
+    loadFx(name) {
+        return this.load.audio("fx-" + name, "asset/audio/fx/" + name + ".mp3")
+    }
+
     loadFont(name) {
         return this.load.bitmapFont(name,
             "./asset/font/" + name + ".png",
@@ -66,7 +70,12 @@ class BootScene extends Phaser.Scene {
         this.loadMusic("desert-mayhem")
         this.loadMusic("funky-runnin")
 
+        this.loadFx("ui-quirky-9")
+        this.loadFx("ui-quirky-31")
+        this.loadFx("ui-quirky-33")
+
         globals.music = new MusicBox()
+        globals.soundfx = new SoundFx()
     }
 
     create () {

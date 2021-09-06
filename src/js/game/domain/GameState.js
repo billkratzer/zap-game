@@ -213,6 +213,10 @@ class GameState {
             }
         }
 
+        if (firingInfo.explodingPieces.length == 0) {
+            globals.soundfx.play("ui-quirky-9")
+        }
+
         // mx and mx represent the final state of the bullet
         switch (this.player.direction) {
             case Direction.UP:

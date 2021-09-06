@@ -6,7 +6,7 @@ class MusicBox {
 
     play(name) {
         this.sound.stopAll()
-        this.sound.play("music-" + name, { loop: true } )
+        this.sound.play("music-" + name, { volume: 0.5, loop: true } )
     }
 
     stop() {

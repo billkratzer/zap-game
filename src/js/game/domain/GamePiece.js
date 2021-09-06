@@ -103,6 +103,8 @@ class GamePiece {
         let pts = new Points(points, boardPos.x, boardPos.y)
         pts.buildSprite(this.scene, this.layer)
         pts.flyHome()
+
+        globals.soundfx.play("ui-quirky-31")
     }
 
     startFade() {
