@@ -119,6 +119,7 @@ class TestScene extends Phaser.Scene {
             "sprites",
             0)
             .setScale(3)
+        this.sprites.player.play("heart")
         this.layers.player.add(this.sprites.player)
 
         //this.spriteIndex = 0
