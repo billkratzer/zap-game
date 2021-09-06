@@ -77,7 +77,7 @@ class GameState {
     }
 
     getRandomPieceType() {
-        let types = [ PieceType.BLUE, PieceType.GREEN, PieceType.ORANGE, PieceType.PURPLE, PieceType.BOLT ]
+        let types = [ PieceType.BLUE, PieceType.GREEN, PieceType.ORANGE, PieceType.PURPLE, PieceType.BOMB ]
 
         return types[ Math.floor( Math.random() * types.length)]
     }
@@ -188,6 +188,13 @@ class GameState {
 
         let bolt = false
 
+        let bomb = false
+        let bombGridPos = {
+            x: 0,
+            y: 0
+        }
+
+
         while (!done) {
             if ( grid.inBounds(gx, gy) ) {
                 let piece = grid.getPieceAt(gx, gy)
@@ -199,7 +206,15 @@ class GameState {
                         gy = gy + dy
                     }
                     else {
-                        if (piece.type === this.player.color) {
+                        if (piece.type === PieceType.BOMB) {
+                            bomb = true
+                            bombGridPos.x = gx
+                            bombGridPos.y = gy
+                            firingInfo.explodingPieces.push(piece)
+                            grid.setPieceAt(gx, gy, null)
+                            done = true
+                        }
+                        else if (piece.type === this.player.color) {
                             firingInfo.explodingPieces.push(piece)
                             grid.setPieceAt(gx, gy, null)
                             gx = gx + dx
@@ -227,6 +242,27 @@ class GameState {
             }
             else {
                 done = true
+            }
+        }
+
+        if (bomb) {
+            if (dx == 0) {
+                this.addExplosion(firingInfo.explodingPieces, grid, gx, gy + dy)
+                this.addExplosion(firingInfo.explodingPieces, grid, gx - 1, gy - dy)
+                this.addExplosion(firingInfo.explodingPieces, grid, gx - 1, gy)
+                this.addExplosion(firingInfo.explodingPieces, grid, gx - 1, gy + dy)
+                this.addExplosion(firingInfo.explodingPieces, grid, gx + 1, gy - dy)
+                this.addExplosion(firingInfo.explodingPieces, grid, gx + 1, gy)
+                this.addExplosion(firingInfo.explodingPieces, grid, gx + 1, gy + dy)
+            }
+            else if (dy == 0) {
+                this.addExplosion(firingInfo.explodingPieces, grid, gx + dx, gy)
+                this.addExplosion(firingInfo.explodingPieces, grid, gx - dx, gy - 1)
+                this.addExplosion(firingInfo.explodingPieces, grid, gx, gy - 1)
+                this.addExplosion(firingInfo.explodingPieces, grid, gx + dx, gy - 1)
+                this.addExplosion(firingInfo.explodingPieces, grid, gx - dx, gy + 1)
+                this.addExplosion(firingInfo.explodingPieces, grid, gx, gy + 1)
+                this.addExplosion(firingInfo.explodingPieces, grid, gx + dx, gy + 1)
             }
         }
 
@@ -258,6 +294,16 @@ class GameState {
         }
 
         return firingInfo
+    }
+
+    addExplosion(pieces, grid, gx, gy) {
+        if (grid.inBounds(gx, gy)) {
+            let piece = grid.getPieceAt(gx, gy)
+            if (piece) {
+                pieces.push(piece)
+                grid.setPieceAt(gx, gy, null)
+            }
+        }
     }
 
 }

@@ -46,12 +46,18 @@ class GamePiece {
         if (this.type == PieceType.BOLT) {
             return "bolt"
         }
+        if (this.type == PieceType.BOMB)  {
+            return "bomb"
+        }
         return "piece-" + this.type + "-facing-" + this.direction
     }
 
     getSpriteMovingKey() {
         if (this.type == PieceType.BOLT) {
             return "bolt"
+        }
+        if (this.type == PieceType.BOMB)  {
+            return "bomb"
         }
         return "piece-" + this.type + "-moving-" + this.direction
     }
@@ -85,13 +91,16 @@ class GamePiece {
             onComplete: this.endMoveSprite,
             onCompleteScope: this
         })
-        this.sprite.play(this.getSpriteMovingKey())
+        if ((this.sprite) && (this.sprite.active)) {
+            this.sprite.play(this.getSpriteMovingKey())
+        }
 
         this.moving = true
     }
 
     endMoveSprite() {
-        if (this.sprite) {
+        if ((this.sprite) && (this.sprite.active)) {
+            console.log("End Move Sprite: ", this.sprite)
             this.sprite.play(this.getSpriteFacingKey())
         }
         this.moving = false
@@ -111,7 +120,7 @@ class GamePiece {
     explode(points) {
         this.exploding = true
 
-        if (this.sprite) {
+        if ((this.sprite) && (this.sprite.active)) {
             this.sprite.play("explosion-" + this.type)
             this.scene.tweens.add({
                 targets: this.sprite,
