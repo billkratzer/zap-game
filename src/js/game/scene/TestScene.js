@@ -119,46 +119,17 @@ class TestScene extends Phaser.Scene {
             "sprites",
             0)
             .setScale(3)
-        this.sprites.player.play("heart")
+        this.sprites.player.play("player-green-up")
         this.layers.player.add(this.sprites.player)
 
 
-        this.sprites.fireVertical = this.add.sprite(
-            this.coords.boardXToScreenX(1),
-            this.coords.boardYToScreenY(8),
-            "vertical-fire",
-            0)
-            .setTint(0xff4444)
-
-        this.sprites.fireVertical.displayWidth = 16
-
         this.tweens.add({
-            targets:  this.sprites.fireVertical,
-            displayHeight: 50,
+            targets: this.sprites.player,
+            rotation: Phaser.Math.DegToRad(-90),
             duration: 5000,
-            ease: 'Back',
-            easeParams: [ 3.5 ],
-            delay: 100
-        });
+            delay: 0
+        })
 
-        this.sprites.fireHorizontal = this.add.sprite(
-            this.coords.boardXToScreenX(1),
-            this.coords.boardYToScreenY(4),
-            "horizontal-fire",
-            0)
-            .setTint(0xff4444)
-            .setOrigin(0, 0)
-
-        this.sprites.fireHorizontal.displayHeight = 16
-
-        this.tweens.add({
-            targets:  this.sprites.fireHorizontal,
-            displayWidth: 50,
-            duration: 5000,
-            ease: 'Back',
-            easeParams: [ 3.5 ],
-            delay: 100
-        });
 
         //this.spriteIndex = 0
 
@@ -215,7 +186,6 @@ class TestScene extends Phaser.Scene {
             case "ArrowUp":
                 this.move("up", 0, -1)
                 break;
-
             case "ArrowDown":
                 this.move("down", 0, 1)
                 break;
@@ -245,48 +215,18 @@ class TestScene extends Phaser.Scene {
     }
 
     move(direction, dx, dy) {
-        if (this.piece.moving) {
-            return
-        }
-        this.piece.moving = true
-        this.piece.direction = direction
-
-        this.piece.x = this.piece.x + dx
-        if (this.piece.x < 0) {
-            this.piece.x = 0
-            this.piece.moving = false
-        }
-        if (this.piece.x > 20) {
-            this.piece.x = 20
-            this.piece.moving = false
-        }
-
-        this.piece.y = this.piece.y + dy
-        if (this.piece.y < 0) {
-            this.piece.y = 0
-            this.piece.moving = false
-        }
-        if (this.piece.y > 14) {
-            this.piece.y = 14
-            this.piece.moving = false
-        }
-
-        if (!this.piece.moving) {
-            return
-        }
 
         this.tweens.add({
-            targets: this.piece.sprite,
+            targets: this.sprites.player,
             x: this.coords.boardXToScreenX(this.piece.x),
             y:  this.coords.boardXToScreenX(this.piece.y),
-            duration: 1000,
+            duration: 5000,
             delay: 0,
             onComplete: this.stopPiece,
             onCompleteScope: this
         })
 
-        let color = this.colors[this.piece.colorIndex]
-        this.piece.sprite.play("piece-" + color + "-move-" + direction)
+        this.sprites.player.play("player-green-" + direction)
 
     }
 
