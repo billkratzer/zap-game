@@ -136,6 +136,19 @@ class GameScene extends Phaser.Scene {
         globals.state.nextPieceIndicator.buildSprite(this, this.layers.indicator)
         globals.state.initNextPiece()
 
+        // Camera Zoom in effect
+        console.log(camera.zoom)
+        camera.zoom = 10
+
+        this.tweens.add({
+            targets: camera,
+            zoom: 1,
+            duration: 1000,
+            ease: 'Back',
+            easeParams: [ 1 ],
+        })
+
+
         // Events
         this.input.on('pointerdown', this.click, this);
 
