@@ -16,6 +16,7 @@ class GameScene extends Phaser.Scene {
         this.timers = {}
         this.counts = {}
         this.state = {}
+        this.keys = {}
 
         this.theme = globals.colors.getTheme("default")
 
@@ -26,10 +27,22 @@ class GameScene extends Phaser.Scene {
 
     preload() {
         globals.animationFactory = new AnimationFactory(this)
+
+        // Keys
+        this.keys.arrowLeft = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT, true, true)
+        this.keys.arrowRight = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT, true, true)
+        this.keys.arrowUp = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP, true, true)
+        this.keys.arrowDown = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN, true, true)
+
+        this.keys.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A, true, true)
+        this.keys.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D, true, true)
+        this.keys.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S, true, true)
+        this.keys.keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W, true, true)
     }
 
 
     create () {
+        console.log("GameScene::create()")
         this.cameras.main.setBackgroundColor(this.theme.background)
 
         this.layers.bottom = this.add.layer().setDepth(0)
@@ -156,6 +169,7 @@ class GameScene extends Phaser.Scene {
 
         this.initLevelTimer()
         this.initNewPieceTimer()
+
     }
 
     togglePause() {
@@ -241,7 +255,6 @@ class GameScene extends Phaser.Scene {
                     this.togglePause();
                     break;
                 case "KeyQ":
-                    console.log("QUITTTING!")
                     this.quit();
                     break;
             }
@@ -253,30 +266,6 @@ class GameScene extends Phaser.Scene {
             case "Enter":
                 globals.state.forceGameOver()
                 globals.state.forcePaused()
-                break
-            case "ArrowLeft":
-                globals.state.player.move(Direction.LEFT, -1, 0)
-                break
-            case "KeyA":
-                globals.state.player.move(Direction.LEFT, -1, 0)
-                break
-            case "ArrowRight":
-                globals.state.player.move(Direction.RIGHT, 1, 0)
-                break
-            case "KeyD":
-                globals.state.player.move(Direction.RIGHT, 1, 0)
-                break
-            case "ArrowUp":
-                globals.state.player.move(Direction.UP, 0, -1)
-                break
-            case "KeyW":
-                globals.state.player.move(Direction.UP, 0, -1)
-                break
-            case "ArrowDown":
-                globals.state.player.move(Direction.DOWN, 0, 1)
-                break
-            case "KeyS":
-                globals.state.player.move(Direction.DOWN, 0, 1)
                 break
             case "Backspace":
                 globals.state.addNewPiece(this, this.layers.pieces)
@@ -469,6 +458,20 @@ class GameScene extends Phaser.Scene {
         }
 
         this.updateInfo()
+
+        if ((this.keys.arrowLeft.isDown) || (this.keys.keyA.isDown)) {
+            globals.state.player.move(Direction.LEFT, -1, 0)
+        }
+        if ((this.keys.arrowRight.isDown) || (this.keys.keyD.isDown)) {
+            globals.state.player.move(Direction.RIGHT, 1, 0)
+        }
+        if ((this.keys.arrowUp.isDown) || (this.keys.keyW.isDown)) {
+            globals.state.player.move(Direction.UP, 0, -1)
+        }
+        if ((this.keys.arrowDown.isDown) || (this.keys.keyS.isDown)) {
+            globals.state.player.move(Direction.DOWN, 0, 1)
+        }
+
 
         if (globals.state.isGameOver()) {
             if (this.counts.gameOver == 0) {
