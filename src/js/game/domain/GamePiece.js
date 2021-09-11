@@ -100,7 +100,6 @@ class GamePiece {
 
     endMoveSprite() {
         if ((this.sprite) && (this.sprite.active)) {
-            console.log("End Move Sprite: ", this.sprite)
             this.sprite.play(this.getSpriteFacingKey())
         }
         this.moving = false
