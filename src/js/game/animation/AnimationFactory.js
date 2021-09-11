@@ -34,9 +34,9 @@ class AnimationFactory {
     buildExtraPieceAnimations() {
         this.scene.anims.create({
             key: "bomb",
-            frames: this.scene.anims.generateFrameNumbers('sprites-3', { frames: this.range(0, 1) }),
-            frameRate: 1,
-            repeat: 0
+            frames: this.scene.anims.generateFrameNumbers('sprites-3', { frames: this.range(0, 3) }),
+            frameRate: 3,
+            repeat: -1
         });
         this.scene.anims.create({
             key: "bolt",
