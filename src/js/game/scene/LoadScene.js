@@ -86,6 +86,9 @@ class LoadScene extends Phaser.Scene {
         this.loadImage("vertical-fire")
         this.loadImage("horizontal-fire")
 
+        this.loadImage("double-points")
+        this.loadImage("inverted-keys")
+
         // Particle Images
         this.loadParticleImage("red")
         this.loadParticleImage("green")
@@ -102,6 +105,7 @@ class LoadScene extends Phaser.Scene {
         this.loadFx("ui-quirky-9")
         this.loadFx("ui-quirky-31")
         this.loadFx("ui-quirky-33")
+        this.loadFx("ui-quirky-35")
 
         globals.music = new MusicBox()
         globals.soundfx = new SoundFx()

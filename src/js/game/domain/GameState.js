@@ -77,7 +77,7 @@ class GameState {
     }
 
     getRandomPieceType() {
-        let types = [ PieceType.BLUE, PieceType.GREEN, PieceType.ORANGE, PieceType.PURPLE, PieceType.BOMB ]
+        let types = [ PieceType.BLUE, PieceType.GREEN, PieceType.ORANGE, PieceType.PURPLE, PieceType.SURPRISE ]
 
         return types[ Math.floor( Math.random() * types.length)]
     }
@@ -103,7 +103,12 @@ class GameState {
     }
 
     calcPoints(streak) {
-        return streak * 100
+        let points = streak * 100
+
+        if ((this.surprise) && (this.surprise.type == SurpriseType.DOUBLE_POINTS)) {
+            points = points * 2
+        }
+        return points
     }
 
     addScore(points) {
@@ -132,6 +137,12 @@ class GameState {
 
     levelUp() {
         this.level++
+    }
+
+    newSurprise() {
+        this.surprise = new Surprise(SurpriseType.DOUBLE_POINTS)
+
+        globals.emitter.emit('new-surprise')
     }
 
     fireMissile() {
@@ -189,6 +200,7 @@ class GameState {
         let bolt = false
 
         let bomb = false
+        let surprise = false
         let bombGridPos = {
             x: 0,
             y: 0
@@ -210,6 +222,12 @@ class GameState {
                             bomb = true
                             bombGridPos.x = gx
                             bombGridPos.y = gy
+                            firingInfo.explodingPieces.push(piece)
+                            grid.setPieceAt(gx, gy, null)
+                            done = true
+                        }
+                        else if (piece.type === PieceType.SURPRISE) {
+                            surprise = true
                             firingInfo.explodingPieces.push(piece)
                             grid.setPieceAt(gx, gy, null)
                             done = true
@@ -268,6 +286,10 @@ class GameState {
 
         if (bolt) {
             globals.soundfx.play("explosion-1")
+        }
+        else if (surprise) {
+            globals.soundfx.play("ui-quirky-35")
+            globals.state.newSurprise()
         }
         else if ((firingInfo.explodingPieces.length == 0) && (firingInfo.startColor != firingInfo.endColor)) {
             globals.soundfx.play("ui-quirky-9")

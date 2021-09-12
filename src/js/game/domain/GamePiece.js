@@ -46,20 +46,30 @@ class GamePiece {
         if (this.type == PieceType.BOLT) {
             return "bolt"
         }
-        if (this.type == PieceType.BOMB)  {
+        else if (this.type == PieceType.BOMB)  {
             return "bomb"
         }
-        return "piece-" + this.type + "-facing-" + this.direction
+        else if (this.type == PieceType.SURPRISE)  {
+            return "surprise"
+        }
+        else {
+            return "piece-" + this.type + "-facing-" + this.direction
+        }
     }
 
     getSpriteMovingKey() {
         if (this.type == PieceType.BOLT) {
             return "bolt"
         }
-        if (this.type == PieceType.BOMB)  {
+        else if (this.type == PieceType.BOMB)  {
             return "bomb"
         }
-        return "piece-" + this.type + "-moving-" + this.direction
+        else if (this.type == PieceType.SURPRISE)  {
+            return "surprise"
+        }
+        else {
+            return "piece-" + this.type + "-moving-" + this.direction
+        }
     }
 
     getType() {

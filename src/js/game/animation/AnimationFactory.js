@@ -45,7 +45,7 @@ class AnimationFactory {
             repeat: 0
         });
         this.scene.anims.create({
-            key: "present",
+            key: "surprise",
             frames: this.scene.anims.generateFrameNumbers('sprites-3', { frames: this.range(20, 1) }),
             frameRate: 1,
             repeat: 0

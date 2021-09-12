@@ -38,6 +38,8 @@ class GameScene extends Phaser.Scene {
         this.keys.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D, true, true)
         this.keys.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S, true, true)
         this.keys.keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W, true, true)
+
+        globals.emitter.on("new-surprise", this.showSurpriseModal, this)
     }
 
 
@@ -52,6 +54,7 @@ class GameScene extends Phaser.Scene {
         this.layers.indicator = this.add.layer().setDepth(4)
         this.layers.pieces = this.add.layer().setDepth(5)
         this.layers.info = this.add.layer().setDepth(10)
+        this.layers.surprise = this.add.layer().setDepth(20)
 
         let coords = globals.coords
 
@@ -449,6 +452,123 @@ class GameScene extends Phaser.Scene {
 
     nextScene() {
         this.scene.start('NewHighScoreScene')
+    }
+
+    onSurpriseTimerEnd() {
+        console.log("Surprise Timer End")
+    }
+
+    hideSurpriseModal() {
+        this.state.showingSurpriseModal = false
+
+        this.timers.levelTimer.paused = false
+        this.timers.newPieceTimer.paused = false
+
+        this.timers.surpriseTimer = this.time.addEvent({
+            delay: globals.state.getLevelSeconds() * 1000,
+            callback: this.onSurpriseTimerEnd,
+            callbackScope: this
+        });
+    }
+
+    surpriseTitleCallback(data) {
+        // https://www.color-hex.com/color-palette/109407
+        let colors = [0x00aed9, 0x53da3f, 0xffe71a, 0xff983a, 0x000000, 0xff17a3]
+
+        data.color = colors[ data.index % colors.length ]
+
+        let degrees = rainbowWave + data.index * 15
+        degrees = degrees % 360
+
+        let radians = degrees * Math.PI / 180.0
+        data.y = data.y + Math.sin(radians) * 5;
+
+        rainbowWave += 1;
+        return data
+    }
+
+    surpriseSubTitleCallback(data) {
+        // https://www.color-hex.com/color-palette/109407
+        let colors = [0x00aed9, 0x53da3f, 0xffe71a, 0xff983a, 0x000000, 0xff17a3]
+
+        data.color = colors[ data.index % colors.length ]
+
+        let degrees = rainbowWave + data.index * 15
+        degrees = degrees % 360
+
+        let radians = degrees * Math.PI / 180.0
+        data.y = data.y + Math.sin(radians) * 5;
+
+        rainbowWave += 1;
+        return data
+    }
+
+
+    showSurpriseModal() {
+        console.log("New surprise modal for: " + globals.state.surprise.type)
+
+        this.state.showingSurpriseModal = true
+
+        this.timers.levelTimer.paused = true
+        this.timers.newPieceTimer.paused = true
+
+        if (this.timers.surpriseTimer) {
+            this.timers.surpriseTimer.destroy()
+        }
+
+        let rectBackground = this.add.rectangle(
+            0,
+            0,
+            globals.coords.screenWidth,
+            globals.coords.screenHeight,
+            0x000000)
+            .setOrigin(0, 0)
+            .setAlpha(0.80)
+
+        console.log("## 2 New surprise modal for: " + globals.state.surprise.type)
+
+        let sprite = globals.state.surprise.buildSprite(this)
+            sprite.setOrigin(0, 0)
+
+        let textTitle = this.add.dynamicBitmapText(0, 0, 'kanit-64-semibold', globals.state.surprise.getTitle().toUpperCase(), 64)
+            .setOrigin(0, 0)
+            .setDisplayCallback(this.surpriseTitleCallback);
+
+        let textSubTitle = this.add.dynamicBitmapText(0, 0, 'kanit-64-semibold', globals.state.surprise.getSubTitle().toUpperCase(), 24)
+            .setOrigin(0, 1)
+            .setDisplayCallback(this.surpriseSubTitleCallback);
+
+        let modalMargin = 40
+
+
+        console.log("sprite width: " + sprite.displayWidth)
+        console.log("sprite width: " + textTitle.width)
+        console.log("sprite width: " + textSubTitle.width)
+        let modalWidth = sprite.displayWidth + Math.max(textTitle.width, textSubTitle.width) + modalMargin * 3
+        let modalHeight = sprite.displayHeight + modalMargin * 2
+        console.log("modalWidth: " + modalWidth)
+
+        let modalX = globals.coords.screenWidth / 2 - modalWidth / 2
+        let modalY = globals.coords.screenHeight / 2 - modalHeight / 2
+
+        let rectModal = this.add.rectangle(
+            modalX,
+            modalY,
+            modalWidth,
+            modalHeight)
+            .setFillStyle(0x000000, 1)
+            .setOrigin(0, 0)
+            .setStrokeStyle(2, 0xff0000, 1)
+
+        let textX = modalX + modalMargin + sprite.displayWidth + modalMargin
+        sprite.setPosition(modalX + modalMargin, modalY + modalMargin)
+        textTitle.setPosition(textX, modalY + modalMargin - 20)
+        textSubTitle.setPosition(textX, modalY + modalMargin + sprite.displayHeight + 5)
+
+        console.log("## 5 New surprise modal for: " + globals.state.surprise.type)
+
+        this.layers.surprise.add([rectBackground, rectModal, sprite, textTitle, textSubTitle])
+        console.log("Added")
     }
 
     update() {
