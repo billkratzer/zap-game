@@ -1,4 +1,6 @@
 let rainbowWave = 0
+let surpriseTitleCounter = 0
+let surpriseSubTitleCounter = 0
 
 class GameScene extends Phaser.Scene {
 
@@ -75,6 +77,12 @@ class GameScene extends Phaser.Scene {
             .setOrigin(1, 1)
             .setLetterSpacing(2)
             .setTint(this.theme.text.color)
+
+        this.texts.surpriseTime = this.add.bitmapText(coords.screenWidth - 15, coords.screenHeight + 5, FONT, "", 32)
+            .setOrigin(0, 0)
+            .setLetterSpacing(2)
+            .setTint(this.theme.text.color)
+            .setVisible(false)
 
         this.layers.info.add([this.texts.score, this.texts.level, this.texts.time])
 
@@ -266,6 +274,9 @@ class GameScene extends Phaser.Scene {
 
         console.log(event.code)
         switch (event.code) {
+            case "Digit1":
+                globals.state.newSurprise()
+                break
             case "Enter":
                 globals.state.forceGameOver()
                 globals.state.forcePaused()
@@ -344,6 +355,9 @@ class GameScene extends Phaser.Scene {
 
         if (this.timers.levelTimer) {
             this.texts.time.setText("" + Math.ceil(this.timers.levelTimer.getRemainingSeconds()))
+        }
+        if (this.timers.surpriseTimer) {
+            this.texts.surpriseTime.setText("" + Math.ceil(this.timers.surpriseTimer.getRemainingSeconds()))
         }
     }
 
@@ -477,36 +491,40 @@ class GameScene extends Phaser.Scene {
 
         data.color = colors[ data.index % colors.length ]
 
-        let degrees = rainbowWave + data.index * 15
+        let degrees = surpriseTitleCounter + data.index * 4
         degrees = degrees % 360
 
         let radians = degrees * Math.PI / 180.0
-        data.y = data.y + Math.sin(radians) * 5;
+        data.scale = 1 + Math.sin(radians) * 0.01
 
-        rainbowWave += 1;
+        surpriseTitleCounter += 0.5;
         return data
     }
 
     surpriseSubTitleCallback(data) {
-        // https://www.color-hex.com/color-palette/109407
-        let colors = [0x00aed9, 0x53da3f, 0xffe71a, 0xff983a, 0x000000, 0xff17a3]
 
-        data.color = colors[ data.index % colors.length ]
+        let textTint = Phaser.Display.Color.HexStringToColor("#EEE434")
 
-        let degrees = rainbowWave + data.index * 15
-        degrees = degrees % 360
+        let tints = []
+        for (let i = 0; i < 10; i++) {
+            tints.push(textTint)
+            textTint = textTint.clone().brighten(2)
+        }
+        for (let i = 0; i < 10; i++) {
+            tints.push(textTint)
+            textTint = textTint.clone().darken(2)
+        }
 
-        let radians = degrees * Math.PI / 180.0
-        data.y = data.y + Math.sin(radians) * 5;
+        let index = Math.floor((surpriseSubTitleCounter / 100) % tints.length)
+        data.color = tints[index].color
 
-        rainbowWave += 1;
+        surpriseSubTitleCounter++
+
         return data
     }
 
 
     showSurpriseModal() {
-        console.log("New surprise modal for: " + globals.state.surprise.type)
-
         this.state.showingSurpriseModal = true
 
         this.timers.levelTimer.paused = true
@@ -525,7 +543,6 @@ class GameScene extends Phaser.Scene {
             .setOrigin(0, 0)
             .setAlpha(0.80)
 
-        console.log("## 2 New surprise modal for: " + globals.state.surprise.type)
 
         let sprite = globals.state.surprise.buildSprite(this)
             sprite.setOrigin(0, 0)
@@ -540,13 +557,8 @@ class GameScene extends Phaser.Scene {
 
         let modalMargin = 40
 
-
-        console.log("sprite width: " + sprite.displayWidth)
-        console.log("sprite width: " + textTitle.width)
-        console.log("sprite width: " + textSubTitle.width)
         let modalWidth = sprite.displayWidth + Math.max(textTitle.width, textSubTitle.width) + modalMargin * 3
         let modalHeight = sprite.displayHeight + modalMargin * 2
-        console.log("modalWidth: " + modalWidth)
 
         let modalX = globals.coords.screenWidth / 2 - modalWidth / 2
         let modalY = globals.coords.screenHeight / 2 - modalHeight / 2
@@ -560,15 +572,88 @@ class GameScene extends Phaser.Scene {
             .setOrigin(0, 0)
             .setStrokeStyle(2, 0xff0000, 1)
 
-        let textX = modalX + modalMargin + sprite.displayWidth + modalMargin
         sprite.setPosition(modalX + modalMargin, modalY + modalMargin)
+
+        let textX = modalX + modalMargin + sprite.displayWidth + modalMargin
         textTitle.setPosition(textX, modalY + modalMargin - 20)
         textSubTitle.setPosition(textX, modalY + modalMargin + sprite.displayHeight + 5)
 
-        console.log("## 5 New surprise modal for: " + globals.state.surprise.type)
-
         this.layers.surprise.add([rectBackground, rectModal, sprite, textTitle, textSubTitle])
-        console.log("Added")
+
+        this.layers.surprise.setAlpha(0)
+        this.tweens.add({
+            targets: this.layers.surprise,
+            alpha: 1,
+            duration: 500,
+            ease: 'Back',
+            easeParams: [ 1 ],
+        })
+
+        this.tweens.add({
+            targets: [rectBackground, rectModal, textTitle, textSubTitle],
+            alpha: 0,
+            delay: 3000,
+            duration: 500,
+            ease: 'Back',
+            easeParams: [ 1 ],
+        })
+
+        this.tweens.add({
+            targets: sprite,
+            x: 10,
+            y: globals.coords.screenHeight - 100 - 10,
+            scale: 100 / sprite.displayHeight,
+            delay: 3000,
+            duration: 500,
+            ease: 'Back',
+            easeParams: [ 1 ],
+            onComplete: this.surpriseSpriteMoveEnd,
+            onCompleteScope: this,
+            onCompleteParams: sprite
+        })
+
+    }
+
+    surpriseSpriteMoveEnd(tween, targets, sprite) {
+        this.sprites.surprise = sprite
+        this.layers.surprise.remove(sprite)
+        this.layers.info.add(sprite)
+
+        // destroy all children in the surprise modal
+        let children = this.layers.surprise.getChildren()
+        for (let i = 0; i < children.length; i++) {
+            let child = children[i]
+            this.layers.surprise.remove(child)
+            child.destroy()
+        }
+
+        // set the surprise timer
+        this.timers.surpriseTimer = this.time.addEvent({
+            delay: globals.state.surprise.getLengthSeconds() * 1000,
+            callback: this.onSurpriseTimerEnd,
+            callbackScope: this
+        });
+
+        this.texts.surpriseTime.setPosition(sprite.x + sprite.displayWidth, sprite.y)
+        this.texts.surpriseTime.setVisible(true)
+
+        this.timers.levelTimer.paused = false
+        this.timers.newPieceTimer.paused = false
+    }
+
+    onSurpriseTimerEnd() {
+        this.texts.surpriseTime.setVisible(false)
+
+        if (this.timers.surpriseTimer) {
+            this.timers.surpriseTimer.destroy()
+        }
+
+        if (this.sprites.surprise) {
+            this.layers.info.remove(this.sprites.surprise)
+            this.sprites.surprise.destroy()
+        }
+
+        globals.state.surprise = null
     }
 
     update() {
