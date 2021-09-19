@@ -13,7 +13,6 @@ class BootScene extends Phaser.Scene {
     create () {
         let camera = this.cameras.main
 
-
         globals.state = new GameState()
         globals.coords = new ScreenCoords(camera.width, camera.height, globals.state.BOARD_WIDTH, globals.state.BOARD_HEIGHT)
         globals.colors = new ColorFactory()

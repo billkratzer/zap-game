@@ -41,7 +41,7 @@ class GameScene extends Phaser.Scene {
         this.keys.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S, true, true)
         this.keys.keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W, true, true)
 
-        globals.emitter.on("new-surprise", this.showSurpriseModal, this)
+        globals.emitter.on(Events.NEW_SURPRISE, this.showSurpriseModal, this)
     }
 
 

@@ -142,7 +142,7 @@ class GameState {
     newSurprise() {
         this.surprise = new Surprise(SurpriseType.DOUBLE_POINTS)
 
-        globals.emitter.emit('new-surprise')
+        globals.emitter.emit(Events.NEW_SURPRISE)
     }
 
     fireMissile() {
