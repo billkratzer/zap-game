@@ -4,7 +4,22 @@ var config = {
     height: 768,
     pixelArt: true,
     parent: "game",
-    scene: [ BootScene, LoadScene, TitleScene, GameScene, NewHighScoreScene, HighScoreScene, TestScene, TestSceneGame, TestSceneScore, TestScenePause ],
+    scene: [
+        BootScene,
+        LoadScene,
+        TitleScene,
+        GameScene,
+        GameOverScene,
+        GamePausedScene,
+        GamePlayScene,
+        GameSurpriseScene,
+        NewHighScoreScene,
+        HighScoreScene,
+        TestScene,
+        TestSceneGame,
+        TestSceneScore,
+        TestScenePause
+    ],
     audio: {
         disableWebAudio: true
     }

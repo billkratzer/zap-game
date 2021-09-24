@@ -151,8 +151,8 @@ class LoadScene extends Phaser.Scene {
     }
 
     create () {
-        this.scene.start('TitleScene');
-        //this.scene.start('TestScene');
+        //this.scene.start('TitleScene');
+        this.scene.start('TestScene');
     }
 
     update() {

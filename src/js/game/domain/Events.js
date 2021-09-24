@@ -1,5 +1,9 @@
 const Events = {
+    QUIT: "quit",
     PAUSE: "pause",
-    UNPAUSE: "UNPAUSE",
-    NEW_SURPRISE: "new-surprise"
+    UNPAUSE: "unpause",
+
+    NEW_SURPRISE: "new-surprise",
+
+    START_NEW_SURPRISE: "start-new-surprise"
 }
