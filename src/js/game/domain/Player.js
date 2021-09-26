@@ -98,7 +98,7 @@ class Player {
         this.scene.tweens.add({
             targets: this.sprite,
             rotation: this.deltaRotation,
-            duration: 80,
+            duration: 60,
             delay: 0,
             onComplete: this.endRotateSprite,
             onCompleteScope: this
@@ -112,8 +112,8 @@ class Player {
             targets: this.sprite,
             x: globals.coords.boardXToScreenX(this.x),
             y: globals.coords.boardYToScreenY(this.y),
-            duration: 80,
-            delay: 80,
+            duration: 60,
+            delay: 60,
             onComplete: this.endMoveSprite,
             onCompleteScope: this
         })
