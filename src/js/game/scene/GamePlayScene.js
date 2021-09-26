@@ -1,7 +1,3 @@
-let rainbowWave = 0
-let surpriseTitleCounter = 0
-let surpriseSubTitleCounter = 0
-
 class GamePlayScene extends Phaser.Scene {
 
     constructor () {
@@ -41,11 +37,16 @@ class GamePlayScene extends Phaser.Scene {
         this.keys.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S, true, true)
         this.keys.keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W, true, true)
 
+        //
+        console.log("Registering events")
         globals.emitter.on(Events.NEW_SURPRISE, this.showSurpriseModal, this)
+        globals.emitter.on(Events.PAUSE, this.pause, this);
+        globals.emitter.on(Events.UNPAUSE, this.unpause, this);
+        globals.emitter.on(Events.QUIT, this.quit, this);
     }
 
 
-    create () {
+    create() {
         console.log("GameScene::create()")
         this.cameras.main.setBackgroundColor(this.theme.background)
 
@@ -172,7 +173,6 @@ class GamePlayScene extends Phaser.Scene {
 
         // Events
         this.input.on('pointerdown', this.click, this);
-
         this.input.keyboard.on('keydown', this.keyDown, this);
 
         // Music
@@ -181,53 +181,20 @@ class GamePlayScene extends Phaser.Scene {
         this.initLevelTimer()
         this.initNewPieceTimer()
 
+
     }
 
-    togglePause() {
-        let state = globals.state
-        state.togglePaused()
+    pause() {
+        this.scene.pause()
+    }
 
-        if (globals.state.paused) {
-            this.timers.levelTimer.paused = true
-            this.timers.newPieceTimer.paused = true
-            this.layers.modal = this.add.layer().setDepth(1000)
-            this.layers.modal.setAlpha(0.85)
-            this.layers.modal.setVisible(true)
-
-            let camera = this.cameras.main
-            let width = camera.width
-            let height = camera.height
-
-            let rect = this.add.rectangle(
-                0,
-                0,
-                globals.coords.screenWidth,
-                globals.coords.screenHeight,
-                0x000000)
-                .setOrigin(0, 0)
-                .setAlpha(0.80)
-
-            let text1 = this.add.bitmapText(width / 2, height * 0.40, 'game-font', 'Game Paused', 64)
-                .setOrigin(0.5, 0.5)
-
-            let text2 = this.add.bitmapText(width / 2, height * 0.55, 'game-font', 'Press Esc to resume', 24)
-                .setOrigin(0.5, 0.5)
-
-            let text3 = this.add.bitmapText(width / 2, height * 0.62, 'game-font', 'Press Q to quit', 24)
-                .setOrigin(0.5, 0.5)
-
-            this.layers.modal.add([rect, text1, text2, text3])
-        }
-        else {
-            this.timers.levelTimer.paused = false
-            this.timers.newPieceTimer.paused = false
-            this.layers.modal.destroy()
-            this.layers.modal = null
-        }
+    unpause() {
+        this.scene.resume()
     }
 
     quit() {
-        this.scene.start('TitleScene')
+        globals.state.forceGameOver()
+        this.scene.pause()
     }
 
     fireMissile() {
@@ -255,31 +222,13 @@ class GamePlayScene extends Phaser.Scene {
     }
 
     keyDown(event) {
-        if (this.state.gameOverInputAllowed) {
-            this.nextScene()
-            return
-        }
-
-        if (globals.state.paused) {
-            switch (event.code) {
-                case "Escape":
-                    this.togglePause();
-                    break;
-                case "KeyQ":
-                    this.quit();
-                    break;
-            }
-            return;
-        }
-
         console.log(event.code)
         switch (event.code) {
             case "Digit1":
                 globals.state.newSurprise()
                 break
             case "Enter":
-                globals.state.forceGameOver()
-                globals.state.forcePaused()
+                globals.emitter.emit(Events.QUIT)
                 break
             case "Backspace":
                 globals.state.addNewPiece(this, this.layers.pieces)
@@ -287,9 +236,6 @@ class GamePlayScene extends Phaser.Scene {
             case "Space":
                 this.fireMissile()
                 break
-            case "Escape":
-                this.togglePause();
-                break;
         }
     }
 
@@ -322,31 +268,6 @@ class GamePlayScene extends Phaser.Scene {
             y: newScreenPosY,
             duration: 1000
         });
-    }
-
-    pause() {
-        this.layers.modal = this.add.layer().setDepth(1000)
-        this.layers.modal.setAlpha(0.85)
-        this.layers.modal.setVisible(true)
-
-        let camera = this.cameras.main
-        let width = camera.width
-        let height = camera.height
-
-        let rect = this.add.rectangle(width / 2, height / 2, width *.60, height * .40, 0x000000)
-            .setOrigin(0.5, 0.5)
-
-        let text1 = this.add.bitmapText(width / 2, height * 0.40, 'game-font', 'Game Paused', 36)
-            .setOrigin(0.5, 0.5)
-
-        let text2 = this.add.bitmapText(width / 2, height * 0.55, 'game-font', 'Press [Esc] to resume', 24)
-            .setOrigin(0.5, 0.5)
-
-        let text3 = this.add.bitmapText(width / 2, height * 0.62, 'game-font', 'Press [q] to quit', 24)
-            .setOrigin(0.5, 0.5)
-
-        this.layers.modal.add([rect, text1, text2, text3])
-
     }
 
     updateInfo() {

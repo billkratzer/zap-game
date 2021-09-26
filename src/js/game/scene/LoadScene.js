@@ -89,6 +89,9 @@ class LoadScene extends Phaser.Scene {
         this.loadImage("double-points")
         this.loadImage("inverted-keys")
 
+        this.loadImage("button-400x100")
+        this.loadImage("button-border-only-400x100")
+
         // Particle Images
         this.loadParticleImage("red")
         this.loadParticleImage("green")
@@ -147,12 +150,11 @@ class LoadScene extends Phaser.Scene {
     }
 
     complete() {
-        console.log("COMPLETE!");
     }
 
     create () {
-        //this.scene.start('TitleScene');
-        this.scene.start('TestScene');
+        this.scene.start('TitleScene');
+        //this.scene.start('TestScene');
     }
 
     update() {

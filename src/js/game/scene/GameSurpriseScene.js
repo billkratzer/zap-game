@@ -1,7 +1,3 @@
-let rainbowWave = 0
-let surpriseTitleCounter = 0
-let surpriseSubTitleCounter = 0
-
 class GameSurpriseScene extends Phaser.Scene {
 
     constructor () {

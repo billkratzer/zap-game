@@ -48,6 +48,10 @@ class GameState {
         this.paused = !this.paused
     }
 
+    setPaused(p) {
+        this.paused = p
+    }
+
     initNextPiece() {
         let type = this.getRandomPieceType()
         let grid = this.selectRandomGrid()

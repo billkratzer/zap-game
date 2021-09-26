@@ -203,7 +203,6 @@ class NewHighScoreScene extends Phaser.Scene {
 
     nextScene() {
         this.scene.start('HighScoreScene');
-
     }
 
     update() {
