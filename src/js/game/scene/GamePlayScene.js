@@ -318,73 +318,6 @@ class GamePlayScene extends Phaser.Scene {
         });
     }
 
-    gameOver() {
-        globals.music.play("cool-puzzler")
-
-        globals.state.forcePaused()
-
-        this.layers.gameOver = this.add.layer().setDepth(2000)
-        this.layers.gameOver.setVisible(true)
-
-        let width = globals.coords.screenWidth
-        let height = globals.coords.screenHeight
-
-        let rect = this.add.rectangle(
-            0,
-            0,
-            globals.coords.screenWidth,
-            globals.coords.screenHeight,
-            0x000000)
-            .setOrigin(0, 0)
-            .setAlpha(0.85)
-
-        const FONT = 'kanit-96-glow'
-        let text1 = this.add.dynamicBitmapText(width / 2, 0 - height, FONT, "GAME OVER", 96)
-            .setOrigin(0.5, 0.5)
-            .setDisplayCallback(this.gameOverTextCallback);
-
-        this.tweens.add({
-            targets: text1,
-            y: height * 0.35,
-            duration: 1000,
-            ease: 'Back',
-            easeParams: [ 0.5 ]
-        })
-
-        let text2 = this.add.bitmapText(width / 2, height + height, FONT, "SCORE:  " + globals.state.score, 48)
-            .setOrigin(0.5, 0.5)
-
-        this.tweens.add({
-            targets: text2,
-            y: height * 0.55,
-            duration: 1000,
-            ease: 'Back',
-            easeParams: [ 0.5 ],
-            onComplete: function() {
-                this.state.gameOverInputAllowed = true
-            },
-            onCompleteScope: this
-        })
-
-        this.layers.gameOver.add([rect, text1, text2])
-    }
-
-    gameOverTextCallback(data) {
-        // https://www.color-hex.com/color-palette/109407
-        let colors = [0x00aed9, 0x53da3f, 0xffe71a, 0xff983a, 0x000000, 0xff17a3]
-
-        data.color = colors[ data.index % colors.length ]
-
-        let degrees = rainbowWave + data.index * 15
-        degrees = degrees % 360
-
-        let radians = degrees * Math.PI / 180.0
-        data.y = data.y + Math.sin(radians) * 5;
-
-        rainbowWave += 1;
-        return data
-    }
-
     nextScene() {
         this.scene.start('NewHighScoreScene')
     }
@@ -600,10 +533,7 @@ class GamePlayScene extends Phaser.Scene {
 
 
         if (globals.state.isGameOver()) {
-            if (this.counts.gameOver == 0) {
-                this.gameOver()
-            }
-            this.counts.gameOver++
+            globals.emitter.emit(Events.GAME_OVER)
         }
 
         if (globals.state.missile) {

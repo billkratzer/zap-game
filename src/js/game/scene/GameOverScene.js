@@ -18,6 +18,7 @@ class GameOverScene extends Phaser.Scene {
 
     preload() {
         globals.emitter.on(Events.QUIT, this.showGameOver, this);
+        globals.emitter.on(Events.GAME_OVER, this.showGameOver, this);
     }
 
 
@@ -64,6 +65,7 @@ class GameOverScene extends Phaser.Scene {
             globals.emitter.emit(Events.GAME_DONE)
         }
     }
+
     showGameOver() {
         globals.music.play("cool-puzzler")
 
