@@ -13,7 +13,6 @@ class GameState {
         this.level = 1
         this.nextPieceType = this.getRandomPieceType()
         this.paused = false
-        this.gameOverInputAllowed = false
 
         this.BOARD_WIDTH = 20
         this.BOARD_HEIGHT = 14

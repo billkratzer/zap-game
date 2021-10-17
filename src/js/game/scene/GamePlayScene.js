@@ -12,15 +12,12 @@ class GamePlayScene extends Phaser.Scene {
         this.sprites = {}
         this.shapes = {}
         this.timers = {}
-        this.counts = {}
         this.state = {}
         this.keys = {}
 
         this.theme = globals.colors.getTheme("default")
 
         globals.state = new GameState()
-
-        this.counts.gameOver = 0
     }
 
     preload() {
@@ -240,14 +237,6 @@ class GamePlayScene extends Phaser.Scene {
     }
 
     click() {
-        if (this.state.gameOverInputAllowed) {
-            this.nextScene()
-            return
-        }
-        if (this.counts.gameOver > 0) {
-            return
-        }
-
         globals.state.addNewPiece(this, this.layers.pieces)
     }
 
@@ -511,11 +500,6 @@ class GamePlayScene extends Phaser.Scene {
     }
 
     update() {
-        // if the game is over (then there is nothing to update)
-        if (this.counts.gameOver > 0) {
-            return
-        }
-
         this.updateInfo()
 
         if ((this.keys.arrowLeft.isDown) || (this.keys.keyA.isDown)) {
