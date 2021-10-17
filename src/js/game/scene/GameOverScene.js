@@ -27,19 +27,21 @@ class GameOverScene extends Phaser.Scene {
         let width = globals.coords.screenWidth
         let height = globals.coords.screenHeight
 
-        this.rects.background = this.add.rectangle(0, 0, width, height, 0x000000)
+        this.components = {}
+
+        this.components.rect = this.add.rectangle(0, 0, width, height, 0x000000)
             .setOrigin(0, 0)
             .setAlpha(0.85)
             .setVisible(false)
 
         const FONT = 'kanit-96-glow'
-        this.texts.gameOver = this.add.dynamicBitmapText(width / 2, 0 - height, FONT, "GAME OVER", 96)
+        this.components.textGameOver = this.add.dynamicBitmapText(width / 2, 0 - height, FONT, "GAME OVER", 96)
             .setOrigin(0.5, 0.5)
             .setDisplayCallback(this.gameOverTextCallback)
             .setVisible(false)
 
 
-        this.texts.score = this.add.bitmapText(width / 2, height + height, FONT, "SCORE:  " + globals.state.score, 48)
+        this.components.textScore = this.add.bitmapText(width / 2, height + height, FONT, "", 48)
             .setOrigin(0.5, 0.5)
             .setVisible(false)
 
@@ -63,12 +65,14 @@ class GameOverScene extends Phaser.Scene {
     showGameOver() {
         globals.music.play("cool-puzzler")
 
-        this.rects.background.setVisible(true)
-        this.texts.gameOver.setVisible(true)
-        this.texts.score.setVisible(true)
+        this.components.textScore.setText("SCORE: " + globals.state.score)
+
+        this.components.rect.setVisible(true)
+        this.components.textGameOver.setVisible(true)
+        this.components.textScore.setVisible(true)
 
         this.tweens.add({
-            targets: this.texts.gameOver,
+            targets: this.components.textGameOver,
             y: globals.coords.getScreenFractionY(0.35),
             duration: 1000,
             ease: 'Back',
@@ -76,7 +80,7 @@ class GameOverScene extends Phaser.Scene {
         })
 
         this.tweens.add({
-            targets: this.texts.score,
+            targets: this.components.textScore,
             y: globals.coords.getScreenFractionY(0.55),
             duration: 1000,
             ease: 'Back',

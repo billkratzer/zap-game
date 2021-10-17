@@ -31,6 +31,9 @@ class NewHighScoreScene extends Phaser.Scene {
             return
         }
 
+        globals.newHighScoreScene = {}
+        globals.newHighScoreScene.rainbowWave = 0
+
         globals.temp.rainbow = shuffle(globals.colors.palettes.rainbow)
 
 
@@ -158,13 +161,13 @@ class NewHighScoreScene extends Phaser.Scene {
 
         data.color = colors[ data.index % colors.length ].color
 
-        let degrees = rainbowWave + data.index * 15
+        let degrees = globals.newHighScoreScene.rainbowWave + data.index * 15
         degrees = degrees % 360
 
         let radians = degrees * Math.PI / 180.0
         data.y = data.y + Math.sin(radians) * 5;
 
-        rainbowWave += 1;
+        globals.newHighScoreScene.rainbowWave += 1;
         return data
     }
 
