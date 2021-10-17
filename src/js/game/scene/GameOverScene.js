@@ -1,7 +1,3 @@
-let rainbowWave = 0
-let surpriseTitleCounter = 0
-let surpriseSubTitleCounter = 0
-
 class GameOverScene extends Phaser.Scene {
 
     constructor () {
@@ -14,6 +10,9 @@ class GameOverScene extends Phaser.Scene {
         this.rects = {}
         this.texts = {}
         this.state = {}
+
+        globals.gameOverScene = {}
+        globals.gameOverScene.rainbowWave = 0
     }
 
     preload() {
@@ -25,18 +24,13 @@ class GameOverScene extends Phaser.Scene {
     create () {
         console.log("GameOverScene::create()")
 
-        this.rects.background = this.add.rectangle(
-            0,
-            0,
-            globals.coords.screenWidth,
-            globals.coords.screenHeight,
-            0x000000)
+        let width = globals.coords.screenWidth
+        let height = globals.coords.screenHeight
+
+        this.rects.background = this.add.rectangle(0, 0, width, height, 0x000000)
             .setOrigin(0, 0)
             .setAlpha(0.85)
             .setVisible(false)
-
-        let width = globals.coords.screenWidth
-        let height = globals.coords.screenHeight
 
         const FONT = 'kanit-96-glow'
         this.texts.gameOver = this.add.dynamicBitmapText(width / 2, 0 - height, FONT, "GAME OVER", 96)
@@ -100,13 +94,13 @@ class GameOverScene extends Phaser.Scene {
 
         data.color = colors[ data.index % colors.length ]
 
-        let degrees = rainbowWave + data.index * 15
+        let degrees = globals.gameOverScene.rainbowWave + data.index * 15
         degrees = degrees % 360
 
         let radians = degrees * Math.PI / 180.0
         data.y = data.y + Math.sin(radians) * 5;
 
-        rainbowWave += 1;
+        globals.gameOverScene.rainbowWave += 1;
         return data
     }
 

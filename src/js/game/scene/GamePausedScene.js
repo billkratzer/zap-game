@@ -14,6 +14,7 @@ class GamePausedScene extends Phaser.Scene {
         this.eventKeys.RESUME_CLICKED = "resume-clicked"
         this.eventKeys.QUIT_CLICKED = "quit-clicked"
 
+
         this.theme = globals.colors.getTheme("default")
     }
 
@@ -25,66 +26,65 @@ class GamePausedScene extends Phaser.Scene {
     create () {
         console.log("GamePausedScene::create()")
 
+        this.components = {
+
+        }
+
+        let coords = globals.coords
+
         // Bottom Layer (mostly opaque, black rectangle)
-        this.rect = this.add.rectangle(
-            0,
-            0,
-            globals.coords.screenWidth,
-            globals.coords.screenHeight,
-            0x000000)
+        this.components.rect = this.add.rectangle(0, 0, coords.screenWidth, coords.screenHeight, 0x000000)
             .setOrigin(0, 0)
             .setAlpha(0.80)
 
-
         // Top Layer (text and buttons)
-        this.textTitle = this.add.bitmapText(
-            globals.coords.getScreenMiddleX(),
-            globals.coords.getScreenFractionY(0.20),
-            "kanit-96-glow",
-            'GAME PAUSED',
+        this.components.textTitle = this.add.bitmapText(
+            coords.getScreenMiddleX(), 
+            coords.getScreenFractionY(0.20), 
+            "kanit-96-glow", 
+            'GAME PAUSED', 
             96)
             .setOrigin(0.5, 0.5)
 
-        this.buttonResume = new PauseScreenButton(
+        this.components.buttonResume = new PauseScreenButton(
             this,
-            globals.coords.getScreenMiddleX(),
-            globals.coords.getScreenFractionY(0.45),
+            coords.getScreenMiddleX(),
+            coords.getScreenFractionY(0.50),
             "RESUME"
         )
         .onClick(this.eventKeys.RESUME_CLICKED)
 
-        this.buttonQuit = new PauseScreenButton(
+        this.components.buttonQuit = new PauseScreenButton(
             this,
-            globals.coords.getScreenMiddleX(),
-            globals.coords.getScreenFractionY(0.70),
+            coords.getScreenMiddleX(),
+            coords.getScreenFractionY(0.70),
             "QUIT"
         )
         .onClick(this.eventKeys.QUIT_CLICKED)
 
-        this.rect.setVisible(false)
-        this.textTitle.setVisible(false)
-        this.buttonResume.setVisible(false)
-        this.buttonQuit.setVisible(false)
+        // hide everything
+        this.showComponents(false)
 
         // Events
         this.events.on(this.eventKeys.RESUME_CLICKED, this.clickResume, this)
         this.events.on(this.eventKeys.QUIT_CLICKED, this.clickQuit, this)
     }
 
+    showComponents(bool) {
+        this.components.rect.setVisible(bool)
+        this.components.textTitle.setVisible(bool)
+        this.components.buttonResume.setVisible(bool)
+        this.components.buttonQuit.setVisible(bool)
+    }
+
     showPauseMenu() {
         console.log("GamePausedScene::showPauseMenu")
-        this.rect.setVisible(true)
-        this.textTitle.setVisible(true)
-        this.buttonResume.setVisible(true)
-        this.buttonQuit.setVisible(true)
+        this.showComponents(true)
     }
 
     hidePauseMenu() {
         console.log("GamePausedScene::hidePauseMenu")
-        this.rect.setVisible(false)
-        this.textTitle.setVisible(false)
-        this.buttonResume.setVisible(false)
-        this.buttonQuit.setVisible(false)
+        this.showComponents(false)
     }
 
     clickResume() {
@@ -105,27 +105,18 @@ class GamePausedScene extends Phaser.Scene {
 class PauseScreenButton {
 
     constructor (scene, x, y, text) {
-        this.texts = {}
-        this.sprites = {}
+        this.components = {}
 
-        this.sprites.button = scene.add.sprite(
-            x,
-            y,
-            "button-400x100"
-        )
+        this.components.button = scene.add.sprite(x, y, "button-400x100")
         .setOrigin(0.5, 0.5)
         .setTint(0x00D1E1)
         .setInteractive()
 
-        this.sprites.border = scene.add.sprite(
-            x,
-            y,
-            "button-border-only-400x100"
-        )
+        this.components.border = scene.add.sprite(x, y, "button-border-only-400x100")
         .setOrigin(0.5, 0.5)
         .setTint(0x8BF7FF)
 
-        this.texts.label = scene.add.bitmapText(
+        this.components.label = scene.add.bitmapText(
             globals.coords.getScreenMiddleX(),
             y,
             "kanit-64-semibold",
@@ -133,16 +124,16 @@ class PauseScreenButton {
             36)
         .setOrigin(0.5, 0.5)
 
-        this.sprites.button.setData("components", {
+        this.components.button.setData("components", {
             scene: scene,
-            spriteButton: this.sprites.button,
-            spriteBorder: this.sprites.border,
-            textLabel: this.texts.label,
+            spriteButton: this.components.button,
+            spriteBorder: this.components.border,
+            textLabel: this.components.label,
             tween: null,
             clickEvent: null
         })
 
-        this.sprites.button.on('pointerover', function () {
+        this.components.button.on('pointerover', function () {
             let data = this.getData("components")
             data.spriteButton.setTint(0xffffff)
             data.spriteBorder.setTint(0xffffff)
@@ -157,7 +148,7 @@ class PauseScreenButton {
         })
 
 
-        this.sprites.button.on('pointerout', function () {
+        this.components.button.on('pointerout', function () {
             let data = this.getData("components")
 
             data.spriteButton.setTint(0x00D1E1)
@@ -172,7 +163,7 @@ class PauseScreenButton {
             }
        })
 
-        this.sprites.button.on('pointerup', function () {
+        this.components.button.on('pointerup', function () {
             let data = this.getData("components")
             if (data.clickEvent) {
                 data.scene.events.emit(data.clickEvent, data.scene)
@@ -182,16 +173,16 @@ class PauseScreenButton {
     }
 
     onClick(eventKey) {
-        let data = this.sprites.button.getData("components")
+        let data = this.components.button.getData("components")
         data.clickEvent = eventKey
 
         return this
     }
 
     setVisible(visible) {
-        this.sprites.button.setVisible(visible)
-        this.sprites.border.setVisible(visible)
-        this.texts.label.setVisible(visible)
+        this.components.button.setVisible(visible)
+        this.components.border.setVisible(visible)
+        this.components.label.setVisible(visible)
     }
 
 }
