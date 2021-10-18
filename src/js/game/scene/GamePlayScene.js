@@ -16,8 +16,6 @@ class GamePlayScene extends Phaser.Scene {
         this.keys = {}
 
         this.theme = globals.colors.getTheme("default")
-
-        globals.state = new GameState()
     }
 
     preload() {
@@ -53,37 +51,9 @@ class GamePlayScene extends Phaser.Scene {
         this.layers.player = this.add.layer().setDepth(3)
         this.layers.indicator = this.add.layer().setDepth(4)
         this.layers.pieces = this.add.layer().setDepth(5)
-        this.layers.info = this.add.layer().setDepth(10)
         this.layers.surprise = this.add.layer().setDepth(20)
 
         let coords = globals.coords
-
-        // Info Layer
-        const FONT = 'kanit-64-semibold'
-        //const FONT = 'game-font'
-        this.texts.score = this.add.bitmapText(10, 80, FONT, "", 64)
-            .setOrigin(0, 1)
-            .setLetterSpacing(2)
-            .setTint(this.theme.text.color)
-
-        this.texts.level = this.add.bitmapText(coords.screenWidth - 15, 80, FONT, "", 64)
-            .setOrigin(1, 1)
-            .setLetterSpacing(4)
-            .setTint(this.theme.text.color)
-
-        this.texts.time = this.add.bitmapText(coords.screenWidth - 15, coords.screenHeight + 5, FONT, "", 64)
-            .setOrigin(1, 1)
-            .setLetterSpacing(2)
-            .setTint(this.theme.text.color)
-
-        this.texts.surpriseTime = this.add.bitmapText(coords.screenWidth - 15, coords.screenHeight + 5, FONT, "", 32)
-            .setOrigin(0, 0)
-            .setLetterSpacing(2)
-            .setTint(this.theme.text.color)
-            .setVisible(false)
-
-        this.layers.info.add([this.texts.score, this.texts.level, this.texts.time])
-
 
         // Bottom Layer
         let playerRectBox1 = this.add.rectangle(
@@ -177,8 +147,6 @@ class GamePlayScene extends Phaser.Scene {
 
         this.initLevelTimer()
         this.initNewPieceTimer()
-
-
     }
 
     pause() {
@@ -259,19 +227,6 @@ class GamePlayScene extends Phaser.Scene {
         });
     }
 
-    updateInfo() {
-        this.texts.score.setText("" + globals.state.score)
-        this.texts.level.setText("LEVEL: " + globals.state.level)
-
-        if (this.timers.levelTimer) {
-            this.texts.time.setText("" + Math.ceil(this.timers.levelTimer.getRemainingSeconds()))
-        }
-        if (this.timers.surpriseTimer) {
-            this.texts.surpriseTime.setText("" + Math.ceil(this.timers.surpriseTimer.getRemainingSeconds()))
-        }
-    }
-
-
     initLevelTimer() {
         if (this.timers.levelTimer) {
             this.timers.levelTimer.destroy()
@@ -281,7 +236,8 @@ class GamePlayScene extends Phaser.Scene {
             callback: this.onLevelTimerEnd,
             callbackScope: this
         });
-
+        
+        globals.emitter.emit(Events.NEW_LEVEL_TIMER, this.timers.levelTimer)
     }
 
     onLevelTimerEnd() {
@@ -460,7 +416,7 @@ class GamePlayScene extends Phaser.Scene {
     surpriseSpriteMoveEnd(tween, targets, sprite) {
         this.sprites.surprise = sprite
         this.layers.surprise.remove(sprite)
-        this.layers.info.add(sprite)
+        //this.layers.info.add(sprite)
 
         // destroy all children in the surprise modal
         let children = this.layers.surprise.getChildren()
@@ -492,7 +448,7 @@ class GamePlayScene extends Phaser.Scene {
         }
 
         if (this.sprites.surprise) {
-            this.layers.info.remove(this.sprites.surprise)
+            //this.layers.info.remove(this.sprites.surprise)
             this.sprites.surprise.destroy()
         }
 
@@ -500,8 +456,6 @@ class GamePlayScene extends Phaser.Scene {
     }
 
     update() {
-        this.updateInfo()
-
         if ((this.keys.arrowLeft.isDown) || (this.keys.keyA.isDown)) {
             globals.state.player.move(Direction.LEFT, -1, 0)
         }

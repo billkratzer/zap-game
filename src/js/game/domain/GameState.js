@@ -116,6 +116,7 @@ class GameState {
 
     addScore(points) {
         this.score = this.score + points
+        globals.emitter.emit(Events.UPDATE_SCORE, this.score)
     }
 
     forceGameOver() {
@@ -140,6 +141,7 @@ class GameState {
 
     levelUp() {
         this.level++
+        globals.emitter.emit(Events.UPDATE_LEVEL, this.level)
     }
 
     newSurprise() {

@@ -19,11 +19,13 @@ class GameScene extends Phaser.Scene {
     }
 
     create () {
+        this.scene.launch('GameInfoScene')
         this.scene.launch('GamePlayScene')
         this.scene.launch('GamePausedScene')
         this.scene.launch('GameOverScene')
 
         this.scene.bringToTop('GamePlayScene')
+        this.scene.bringToTop('GameInfoScene')
         this.scene.bringToTop('GamePausedScene')
         this.scene.bringToTop('GameOverScene')
 
@@ -56,6 +58,7 @@ class GameScene extends Phaser.Scene {
         this.scene.stop('GamePlayScene')
         this.scene.stop('GamePausedScene')
         this.scene.stop('GameOverScene')
+        this.scene.stop('GameInfoScene')
 
         this.scene.start('NewHighScoreScene');
     }

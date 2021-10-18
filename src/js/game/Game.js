@@ -9,6 +9,7 @@ var config = {
         LoadScene,
         TitleScene,
         GameScene,
+        GameInfoScene,
         GameOverScene,
         GamePausedScene,
         GamePlayScene,
@@ -29,5 +30,5 @@ var game = new Phaser.Game(config);
 
 var globals = {
     gameState: null,
-    version: '0.1'
+    version: '0.5'
 }
